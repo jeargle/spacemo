@@ -61,8 +61,10 @@ endState = {
 
 game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-div');
 
-game.state.add.('boot', bootState);
-game.state.add.('load', loadState);
-game.state.add.('title', titleState);
-game.state.add.('play', playState);
-game.state.add.('end', endState);
+game.state.add('boot', bootState);
+game.state.add('load', loadState);
+game.state.add('title', titleState);
+game.state.add('play', playState);
+game.state.add('end', endState);
+
+game.state.start('boot');
