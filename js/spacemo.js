@@ -16,8 +16,14 @@ bootState = {
 loadState = {
     preload: function() {
         'use strict';
+        var loadLbl;
 
+        loadLbl = game.add.text(80, 160, 'loading...',
+                                {font: '30px Courier', fill: '#ffffff'});
+        
         // Load art assets
+        game.load.image('player', 'assets/square-red.png');
+        game.load.image('exit', 'assets/square-blue.png');
     },
     create: function() {
         'use strict';
@@ -28,6 +34,15 @@ loadState = {
 titleState = {
     create: function() {
         'use strict';
+        var nameLbl, startLbl, wKey;
+
+        nameLbl = game.add.text(80, 160, 'SPACEMO',
+                                {font: '50px Courier', fill: '#ffffff'});
+        startLbl = game.add.text(80, 240, 'press "W" to start',
+                                 {font: '30px Courier', fill: '#ffffff'});
+
+        wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        wKey.onDown.addOnce(this.start, this);
     },
     start: function() {
         'use strict';
