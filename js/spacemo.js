@@ -24,7 +24,7 @@ loadState = {
         
         // Load art assets
         game.load.image('player', 'assets/square-red.png');
-        game.load.image('exit', 'assets/square-blue.png');
+        game.load.image('enemy', 'assets/square-blue.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
     },
@@ -64,21 +64,32 @@ playState = {
         
         this.keyboard = game.input.keyboard;
 
-        this.player = game.add.sprite(384, 500, 'player');
+        this.player = game.add.sprite(game.world.centerX, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
-        this.exit = game.add.sprite(256, 256, 'exit');
-        game.physics.enable(this.exit, Phaser.Physics.ARCADE);
+        this.enemy = game.add.sprite(256, 256, 'enemy');
+        game.physics.enable(this.enemy, Phaser.Physics.ARCADE);
+
+        this.bullets = game.add.group();
+        this.bullets.enableBody = true;
+        this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        this.bullets.createMultiple(30, 'bullet');
+        this.bullets.setAll('anchor.x', 0.5);
+        this.bullets.setAll('anchor.y', 1);
+        this.bullets.setAll('outOfBoundsKill', true);
+        this.bullets.setAll('checkWorldBounds', true);
         
-        this.bullet = game.add.sprite(0, 0, 'bullet');
-        game.physics.enable(this.bullet, Phaser.Physics.ARCADE);
+        this.bulletTime = 0;
+        this.bulletTimeOffset = 200;
 
         this.bulletSpeed = 500;
+
+        this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     },
     update: function() {
         'use strict';
 
-        game.physics.arcade.overlap(this.bullet, this.exit, this.end, null, this);
+        game.physics.arcade.overlap(this.bullets, this.enemy, this.end, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player.body.velocity.x = -175;
@@ -90,7 +101,7 @@ playState = {
             this.player.body.velocity.x = 0;
         }
 
-        if (this.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        if (this.fireButton.isDown) {
             this.fire();
         }
 
@@ -98,13 +109,17 @@ playState = {
     },
     fire: function() {
         'use strict';
-        
-        this.bullet.body.position.x = this.player.body.position.x + 14;
-        this.bullet.body.position.y = this.player.body.position.y;
-        
-        // this.bullet.body.velocity.x = 0;
-        this.bullet.body.velocity.y = 0;
-        this.bullet.body.velocity.y = -this.bulletSpeed;
+        var bullet;
+
+        if (game.time.now > this.bulletTime) {
+            bullet = this.bullets.getFirstExists(false);
+
+            if (bullet) {
+                bullet.reset(this.player.x + 14, this.player.y);
+                bullet.body.velocity.y = -this.bulletSpeed;
+                this.bulletTime = game.time.now + this.bulletTimeOffset;
+            }
+        }
     },
     end: function() {
         'use strict';
