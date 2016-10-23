@@ -25,6 +25,7 @@ loadState = {
         // Load art assets
         game.load.image('player', 'assets/square-red.png');
         game.load.image('exit', 'assets/square-blue.png');
+        game.load.image('bullet', 'assets/bullet.png');
     },
     create: function() {
         'use strict';
@@ -61,20 +62,28 @@ playState = {
 
         this.player = game.add.sprite(16, 16, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
+        this.direction = 'E';
 
         this.exit = game.add.sprite(256, 256, 'exit');
         game.physics.enable(this.exit, Phaser.Physics.ARCADE);
+        
+        this.bullet = game.add.sprite(0, 0, 'bullet');
+        game.physics.enable(this.bullet, Phaser.Physics.ARCADE);
+
+        this.bulletSpeed = 500;
     },
     update: function() {
         'use strict';
 
-        game.physics.arcade.overlap(this.player, this.exit, this.end, null, this);
+        game.physics.arcade.overlap(this.bullet, this.exit, this.end, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player.body.velocity.x = -175;
+            this.direction = 'W';
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
             this.player.body.velocity.x = 175;
+            this.direction = 'E';
         }
         else {
             this.player.body.velocity.x = 0;
@@ -82,12 +91,41 @@ playState = {
 
         if (this.keyboard.isDown(Phaser.Keyboard.W)) {
             this.player.body.velocity.y = -175;
+            this.direction = 'N';
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.S)) {
             this.player.body.velocity.y = 175;
+            this.direction = 'S';
         }
         else {
             this.player.body.velocity.y = 0;
+        }
+
+        if (this.keyboard.isDown(Phaser.Keyboard.J)) {
+            this.fire();
+        }
+    },
+    fire: function() {
+        'use strict';
+
+        // console.log('(' + this.player.body.position.x + ', ' + this.player.body.position.y + ')');
+        
+        this.bullet.body.position.x = this.player.body.position.x + 15;
+        this.bullet.body.position.y = this.player.body.position.y + 15;
+        
+        this.bullet.body.velocity.x = 0;
+        this.bullet.body.velocity.y = 0;
+        if (this.direction === 'N') {
+            this.bullet.body.velocity.y = -this.bulletSpeed;
+        }
+        else if (this.direction === 'E') {
+            this.bullet.body.velocity.x = this.bulletSpeed;
+        }
+        else if (this.direction === 'S') {
+            this.bullet.body.velocity.y = this.bulletSpeed;
+        }
+        else if (this.direction === 'W') {
+            this.bullet.body.velocity.x = -this.bulletSpeed;
         }
     },
     end: function() {
