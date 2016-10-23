@@ -26,6 +26,7 @@ loadState = {
         game.load.image('player', 'assets/square-red.png');
         game.load.image('exit', 'assets/square-blue.png');
         game.load.image('bullet', 'assets/bullet.png');
+        game.load.image('background', 'assets/space-background.png');
     },
     create: function() {
         'use strict';
@@ -58,11 +59,13 @@ playState = {
     create: function() {
         'use strict';
 
+        this.background = game.add.tileSprite(0, 0, 800, 600, 'background');
+        this.backgroundSpeed = 2;
+        
         this.keyboard = game.input.keyboard;
 
-        this.player = game.add.sprite(16, 16, 'player');
+        this.player = game.add.sprite(384, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
-        this.direction = 'E';
 
         this.exit = game.add.sprite(256, 256, 'exit');
         game.physics.enable(this.exit, Phaser.Physics.ARCADE);
@@ -79,54 +82,29 @@ playState = {
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player.body.velocity.x = -175;
-            this.direction = 'W';
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
             this.player.body.velocity.x = 175;
-            this.direction = 'E';
         }
         else {
             this.player.body.velocity.x = 0;
         }
 
-        if (this.keyboard.isDown(Phaser.Keyboard.W)) {
-            this.player.body.velocity.y = -175;
-            this.direction = 'N';
-        }
-        else if (this.keyboard.isDown(Phaser.Keyboard.S)) {
-            this.player.body.velocity.y = 175;
-            this.direction = 'S';
-        }
-        else {
-            this.player.body.velocity.y = 0;
-        }
-
-        if (this.keyboard.isDown(Phaser.Keyboard.J)) {
+        if (this.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
             this.fire();
         }
+
+        this.background.tilePosition.y += this.backgroundSpeed;
     },
     fire: function() {
         'use strict';
-
-        // console.log('(' + this.player.body.position.x + ', ' + this.player.body.position.y + ')');
         
-        this.bullet.body.position.x = this.player.body.position.x + 15;
-        this.bullet.body.position.y = this.player.body.position.y + 15;
+        this.bullet.body.position.x = this.player.body.position.x + 14;
+        this.bullet.body.position.y = this.player.body.position.y;
         
-        this.bullet.body.velocity.x = 0;
+        // this.bullet.body.velocity.x = 0;
         this.bullet.body.velocity.y = 0;
-        if (this.direction === 'N') {
-            this.bullet.body.velocity.y = -this.bulletSpeed;
-        }
-        else if (this.direction === 'E') {
-            this.bullet.body.velocity.x = this.bulletSpeed;
-        }
-        else if (this.direction === 'S') {
-            this.bullet.body.velocity.y = this.bulletSpeed;
-        }
-        else if (this.direction === 'W') {
-            this.bullet.body.velocity.x = -this.bulletSpeed;
-        }
+        this.bullet.body.velocity.y = -this.bulletSpeed;
     },
     end: function() {
         'use strict';
