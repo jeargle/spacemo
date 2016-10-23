@@ -67,8 +67,19 @@ playState = {
         this.player = game.add.sprite(game.world.centerX, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
-        this.enemy = game.add.sprite(256, 256, 'enemy');
-        game.physics.enable(this.enemy, Phaser.Physics.ARCADE);
+        this.enemies = game.add.group();
+        this.enemies.enableBody = true;
+        this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
+        // this.enemies.createMultiple(10, 'enemy');
+        // this.enemies.setAll('anchor.x', 0.5);
+        // this.enemies.setAll('anchor.y', 0.5);
+        // this.enemies.setAll('outOfBoundsKill', true);
+        // this.enemies.setAll('checkWorldBounds', true);
+
+        this.createEnemies();
+        
+        // this.enemy = game.add.sprite(256, 256, 'enemy');
+        // game.physics.enable(this.enemy, Phaser.Physics.ARCADE);
 
         this.bullets = game.add.group();
         this.bullets.enableBody = true;
@@ -89,7 +100,9 @@ playState = {
     update: function() {
         'use strict';
 
-        game.physics.arcade.overlap(this.bullets, this.enemy, this.end, null, this);
+        // game.physics.arcade.overlap(this.bullets, this.enemy, this.end, null, this);
+        game.physics.arcade.overlap(this.bullets, this.enemies,
+                                    this.killEnemy, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player.body.velocity.x = -175;
@@ -120,6 +133,41 @@ playState = {
                 this.bulletTime = game.time.now + this.bulletTimeOffset;
             }
         }
+    },
+    createEnemies: function() {
+        'use strict';
+        var i, j, enemy, tween;
+
+        for (i=0; i<4; i++) {
+            for (j=0; j<10; j++) {
+                enemy = this.enemies.create(j*48, i*50, 'enemy');
+                enemy.anchor.setTo(0.5, 0.5);
+            }
+        }
+
+        this.enemies.x = 100;
+        this.enemies.y = 50;
+
+        tween = game.add.tween(this.enemies)
+            .to({x: 200}, 2000,
+                Phaser.Easing.Linear.None,
+                true, 0, 1000, true);
+        // tween.onLoop.add(this.descend, this);
+        tween.onRepeat.add(this.descend, this);
+    },
+    descend: function() {
+        'use strict';
+
+        console.log('descend');
+
+        this.enemies.y += 10;
+    },
+    killEnemy: function(bullet, enemy) {
+        'use strict';
+
+        bullet.kill();
+        enemy.kill();
+        
     },
     end: function() {
         'use strict';
