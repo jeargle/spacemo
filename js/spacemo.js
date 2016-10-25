@@ -56,28 +56,23 @@ playState = {
     create: function() {
         'use strict';
 
+        // Background
         this.background = game.add.tileSprite(0, 0, 800, 600, 'background');
         this.backgroundSpeed = 2;
         
         this.keyboard = game.input.keyboard;
 
+        // Player
         this.player = game.add.sprite(game.world.centerX, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
+        // Enemies
         this.enemies = game.add.group();
         this.enemies.enableBody = true;
         this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
-        // this.enemies.createMultiple(10, 'enemy');
-        // this.enemies.setAll('anchor.x', 0.5);
-        // this.enemies.setAll('anchor.y', 0.5);
-        // this.enemies.setAll('outOfBoundsKill', true);
-        // this.enemies.setAll('checkWorldBounds', true);
-
         this.createEnemies();
-        
-        // this.enemy = game.add.sprite(256, 256, 'enemy');
-        // game.physics.enable(this.enemy, Phaser.Physics.ARCADE);
 
+        // Bullets
         this.bullets = game.add.group();
         this.bullets.enableBody = true;
         this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -89,11 +84,11 @@ playState = {
         
         this.bulletTime = 0;
         this.bulletTimeOffset = 200;
-
         this.bulletSpeed = 500;
 
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
+        // Score
         this.score = 0;
         this.scoreText = game.add.text(600, 10, 'Score: ' + this.score,
                                        {font: '30px Courier',
@@ -164,14 +159,10 @@ playState = {
     },
     descend: function() {
         'use strict';
-
-        console.log('descend');
-
         this.enemies.y += 15;
     },
     killEnemy: function(bullet, enemy) {
         'use strict';
-
         bullet.kill();
         enemy.kill();
         this.score += 10;
