@@ -1,7 +1,4 @@
-var bootState, loadState, titleState, playState, endState, score, game;
-
-score = 0;
-
+var bootState, loadState, titleState, playState, endState, game;
 
 bootState = {
     create: function() {
@@ -96,11 +93,19 @@ playState = {
         this.bulletSpeed = 500;
 
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+        this.score = 0;
+        this.scoreText = game.add.text(600, 10, 'Score: ' + this.score,
+                                       {font: '30px Courier',
+                                        fill: '#ffffff'});
     },
     update: function() {
         'use strict';
 
-        // game.physics.arcade.overlap(this.bullets, this.enemy, this.end, null, this);
+        if (this.enemies.countLiving() === 0) {
+            this.end();
+        }
+        
         game.physics.arcade.overlap(this.bullets, this.enemies,
                                     this.killEnemy, null, this);
 
@@ -119,6 +124,8 @@ playState = {
         }
 
         this.background.tilePosition.y += this.backgroundSpeed;
+
+        this.scoreText.text = 'Score: ' + this.score;
     },
     fire: function() {
         'use strict';
@@ -140,16 +147,16 @@ playState = {
 
         for (i=0; i<4; i++) {
             for (j=0; j<10; j++) {
-                enemy = this.enemies.create(j*48, i*50, 'enemy');
+                enemy = this.enemies.create(j*50, i*50, 'enemy');
                 enemy.anchor.setTo(0.5, 0.5);
             }
         }
 
-        this.enemies.x = 100;
-        this.enemies.y = 50;
+        this.enemies.x = 50;
+        this.enemies.y = 100;
 
         tween = game.add.tween(this.enemies)
-            .to({x: 200}, 2000,
+            .to({x: 300}, 4000,
                 Phaser.Easing.Linear.None,
                 true, 0, 1000, true);
         // tween.onLoop.add(this.descend, this);
@@ -160,14 +167,14 @@ playState = {
 
         console.log('descend');
 
-        this.enemies.y += 10;
+        this.enemies.y += 15;
     },
     killEnemy: function(bullet, enemy) {
         'use strict';
 
         bullet.kill();
         enemy.kill();
-        
+        this.score += 10;
     },
     end: function() {
         'use strict';
