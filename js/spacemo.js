@@ -58,7 +58,7 @@ playState = {
 
         // Background
         this.background = game.add.tileSprite(0, 0, 800, 600, 'background');
-        this.backgroundSpeed = 2;
+        this.backgroundSpeed = 1;
         
         this.keyboard = game.input.keyboard;
 
@@ -70,7 +70,12 @@ playState = {
         this.enemies = game.add.group();
         this.enemies.enableBody = true;
         this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
-        this.createEnemies();
+        this.enemies.createMultiple(30, 'enemy');
+        // this.createEnemies();
+        this.enemiesKilled = 0;
+        this.enemyTime = 0;
+        this.enemyTimeOffset = 1500;
+        this.enemySpeed = 100;
 
         // Bullets
         this.bullets = game.add.group();
@@ -97,7 +102,7 @@ playState = {
     update: function() {
         'use strict';
 
-        if (this.enemies.countLiving() === 0) {
+        if (this.enemiesKilled === 10) {
             this.end();
         }
         
@@ -105,10 +110,10 @@ playState = {
                                     this.killEnemy, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.body.velocity.x = -175;
+            this.player.body.velocity.x = -200;
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.body.velocity.x = 175;
+            this.player.body.velocity.x = 200;
         }
         else {
             this.player.body.velocity.x = 0;
@@ -118,6 +123,10 @@ playState = {
             this.fire();
         }
 
+        if (game.time.now > this.enemyTime) {
+            this.dispatchEnemy();
+        }
+        
         this.background.tilePosition.y += this.backgroundSpeed;
 
         this.scoreText.text = 'Score: ' + this.score;
@@ -134,6 +143,18 @@ playState = {
                 bullet.body.velocity.y = -this.bulletSpeed;
                 this.bulletTime = game.time.now + this.bulletTimeOffset;
             }
+        }
+    },
+    dispatchEnemy: function() {
+        'use strict';
+        var enemy;
+        
+        enemy = this.enemies.getFirstExists(false);
+
+        if (enemy) {
+            enemy.reset(game.rnd.integerInRange(1,6)*100, 0);
+            enemy.body.velocity.y = this.enemySpeed;
+            this.enemyTime = game.time.now + this.enemyTimeOffset;
         }
     },
     createEnemies: function() {
@@ -166,6 +187,7 @@ playState = {
         bullet.kill();
         enemy.kill();
         this.score += 10;
+        this.enemiesKilled++;
     },
     end: function() {
         'use strict';
