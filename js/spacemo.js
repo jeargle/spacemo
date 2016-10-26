@@ -71,10 +71,12 @@ playState = {
         this.enemies.enableBody = true;
         this.enemies.physicsBodyType = Phaser.Physics.ARCADE;
         this.enemies.createMultiple(30, 'enemy');
+        this.enemies.setAll('outOfBoundsKill', true);
+        this.enemies.setAll('checkWorldBounds', true);
         // this.createEnemies();
         this.enemiesKilled = 0;
         this.enemyTime = 0;
-        this.enemyTimeOffset = 1500;
+        this.enemyTimeOffset = 800;
         this.enemySpeed = 100;
 
         // Bullets
@@ -88,7 +90,7 @@ playState = {
         this.bullets.setAll('checkWorldBounds', true);
         
         this.bulletTime = 0;
-        this.bulletTimeOffset = 200;
+        this.bulletTimeOffset = 300;
         this.bulletSpeed = 500;
 
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -152,9 +154,11 @@ playState = {
         enemy = this.enemies.getFirstExists(false);
 
         if (enemy) {
-            enemy.reset(game.rnd.integerInRange(1,6)*100, 0);
+            enemy.reset(game.rnd.integerInRange(1,6)*100, -30);
             enemy.body.velocity.y = this.enemySpeed;
-            this.enemyTime = game.time.now + this.enemyTimeOffset;
+            this.enemyTime = game.time.now +
+                this.enemyTimeOffset +
+                game.rnd.integerInRange(0,8)*200;
         }
     },
     createEnemies: function() {
