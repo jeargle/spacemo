@@ -1,4 +1,6 @@
-var bootState, loadState, titleState, playState, endState, game;
+var score, bootState, loadState, titleState, playState, endState, game;
+
+score = 0;
 
 bootState = {
     create: function() {
@@ -96,7 +98,7 @@ playState = {
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
         // Score
-        this.score = 0;
+        score = 0;
         this.scoreText = game.add.text(600, 10, 'Score: ' + this.score,
                                        {font: '30px Courier',
                                         fill: '#ffffff'});
@@ -104,10 +106,8 @@ playState = {
     update: function() {
         'use strict';
 
-        if (this.enemiesKilled === 10) {
-            this.end();
-        }
-        
+        game.physics.arcade.overlap(this.player, this.enemies,
+                                    this.end, null, this);
         game.physics.arcade.overlap(this.bullets, this.enemies,
                                     this.killEnemy, null, this);
 
@@ -131,7 +131,7 @@ playState = {
         
         this.background.tilePosition.y += this.backgroundSpeed;
 
-        this.scoreText.text = 'Score: ' + this.score;
+        this.scoreText.text = 'Score: ' + score;
     },
     fire: function() {
         'use strict';
@@ -149,16 +149,21 @@ playState = {
     },
     dispatchEnemy: function() {
         'use strict';
-        var enemy;
+        var enemy, tween, xPos;
         
         enemy = this.enemies.getFirstExists(false);
 
         if (enemy) {
-            enemy.reset(game.rnd.integerInRange(1,6)*100, -30);
+            xPos = game.rnd.integerInRange(1,6)*100;
+            enemy.reset(xPos, -30);
             enemy.body.velocity.y = this.enemySpeed;
             this.enemyTime = game.time.now +
                 this.enemyTimeOffset +
                 game.rnd.integerInRange(0,8)*200;
+            tween = game.add.tween(enemy)
+                .to({x: xPos+50}, 1500,
+                    Phaser.Easing.Linear.None,
+                    true, 0, 1000, true);
         }
     },
     createEnemies: function() {
@@ -190,7 +195,7 @@ playState = {
         'use strict';
         bullet.kill();
         enemy.kill();
-        this.score += 10;
+        score += 10;
         this.enemiesKilled++;
     },
     end: function() {
@@ -202,9 +207,12 @@ playState = {
 endState = {
     create: function() {
         'use strict';
-        var nameLbl, startLbl, wKey;
+        var scoreLbl, nameLbl, startLbl, wKey;
 
-        nameLbl = game.add.text(80, 160, 'YOU WON',
+        scoreLbl = game.add.text(600, 10, 'Score: ' + score,
+                                 {font: '30px Courier',
+                                  fill: '#ffffff'});
+        nameLbl = game.add.text(80, 160, 'YOU DIED',
                                 {font: '50px Courier',
                                  fill: '#ffffff'});
         startLbl = game.add.text(80, 240, 'press "W" to restart',
