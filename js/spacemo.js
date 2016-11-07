@@ -24,6 +24,7 @@ loadState = {
         // Load art assets
         game.load.image('player', 'assets/square-red.png');
         game.load.image('enemy', 'assets/square-blue.png');
+        game.load.image('powerup', 'assets/square-green.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
     },
@@ -67,6 +68,7 @@ playState = {
         // Player
         this.player = game.add.sprite(game.world.centerX, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
+        this.playerSpeed = 200;
 
         // Enemies
         this.enemies = game.add.group();
@@ -80,6 +82,18 @@ playState = {
         this.enemyTime = 0;
         this.enemyTimeOffset = 800;
         this.enemySpeed = 100;
+
+        // Powerups
+        this.powerups = game.add.group();
+        this.powerups.enableBody = true;
+        this.powerups.physicsBodyType = Phaser.Physics.ARCADE;
+        this.powerups.createMultiple(5, 'powerup');
+        this.powerups.setAll('outOfBoundsKill', true);
+        this.powerups.setAll('checkWorldBounds', true);
+        this.powerupsKilled = 0;
+        this.powerupTime = 0;
+        this.powerupTimeOffset = 800;
+        this.powerupSpeed = 100;
 
         // Bullets
         this.bullets = game.add.group();
@@ -110,12 +124,14 @@ playState = {
                                     this.end, null, this);
         game.physics.arcade.overlap(this.bullets, this.enemies,
                                     this.killEnemy, null, this);
+        game.physics.arcade.overlap(this.player, this.powerups,
+                                    this.addSpeed, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.body.velocity.x = -200;
+            this.player.body.velocity.x = -this.playerSpeed;
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.body.velocity.x = 200;
+            this.player.body.velocity.x = this.playerSpeed;
         }
         else {
             this.player.body.velocity.x = 0;
@@ -138,12 +154,12 @@ playState = {
         var bullet;
 
         if (game.time.now > this.bulletTime) {
+            this.bulletTime = game.time.now + this.bulletTimeOffset;
             bullet = this.bullets.getFirstExists(false);
 
             if (bullet) {
                 bullet.reset(this.player.x + 14, this.player.y);
                 bullet.body.velocity.y = -this.bulletSpeed;
-                this.bulletTime = game.time.now + this.bulletTimeOffset;
             }
         }
     },
@@ -193,10 +209,34 @@ playState = {
     },
     killEnemy: function(bullet, enemy) {
         'use strict';
+        var xPos, yPos;
+
+        xPos = enemy.position.x;
+        yPos = enemy.position.y;
         bullet.kill();
         enemy.kill();
         score += 10;
         this.enemiesKilled++;
+        if (game.rnd.integerInRange(1,10) === 10) {
+            this.createPowerup(xPos, yPos);
+        }
+    },
+    createPowerup: function(xPos, yPos) {
+        'use strict';
+        var powerup;
+        
+        powerup = this.powerups.getFirstExists(false);
+
+        if (powerup) {
+            powerup.reset(xPos, yPos);
+            powerup.body.velocity.y = this.powerupSpeed;
+        }
+    },
+    addSpeed: function(player, powerup) {
+        'use strict';
+        powerup.kill();
+        score += 15;
+        this.playerSpeed += 20;
     },
     end: function() {
         'use strict';
