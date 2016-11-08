@@ -27,6 +27,8 @@ loadState = {
         game.load.image('powerup', 'assets/square-green.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
+        game.load.audio('explosion', 'assets/explosion.wav');
+        game.load.audio('grabpowerup', 'assets/powerup.wav');
     },
     create: function() {
         'use strict';
@@ -82,6 +84,7 @@ playState = {
         this.enemyTime = 0;
         this.enemyTimeOffset = 800;
         this.enemySpeed = 100;
+        this.explosion = game.add.audio('explosion');
 
         // Powerups
         this.powerups = game.add.group();
@@ -90,6 +93,7 @@ playState = {
         this.powerups.createMultiple(5, 'powerup');
         this.powerups.setAll('outOfBoundsKill', true);
         this.powerups.setAll('checkWorldBounds', true);
+        this.grabpowerup = game.add.audio('grabpowerup');
         this.powerupsKilled = 0;
         this.powerupTime = 0;
         this.powerupTimeOffset = 800;
@@ -215,6 +219,7 @@ playState = {
         yPos = enemy.position.y;
         bullet.kill();
         enemy.kill();
+        this.explosion.play();
         score += 10;
         this.enemiesKilled++;
         if (game.rnd.integerInRange(1,10) === 10) {
@@ -235,6 +240,7 @@ playState = {
     addSpeed: function(player, powerup) {
         'use strict';
         powerup.kill();
+        this.grabpowerup.play();
         score += 15;
         this.playerSpeed += 20;
     },
