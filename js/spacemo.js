@@ -24,7 +24,8 @@ loadState = {
         // Load art assets
         game.load.image('player', 'assets/square-red.png');
         game.load.image('enemy', 'assets/square-blue.png');
-        game.load.image('powerup', 'assets/square-green.png');
+        game.load.image('pup-speed', 'assets/pup-green.png');
+        game.load.image('pup-weapon', 'assets/pup-blue.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
         game.load.audio('explosion', 'assets/explosion.wav');
@@ -87,17 +88,24 @@ playState = {
         this.explosion = game.add.audio('explosion');
 
         // Powerups
-        this.powerups = game.add.group();
-        this.powerups.enableBody = true;
-        this.powerups.physicsBodyType = Phaser.Physics.ARCADE;
-        this.powerups.createMultiple(5, 'powerup');
-        this.powerups.setAll('outOfBoundsKill', true);
-        this.powerups.setAll('checkWorldBounds', true);
-        this.grabpowerup = game.add.audio('grabpowerup');
-        this.powerupsKilled = 0;
-        this.powerupTime = 0;
-        this.powerupTimeOffset = 800;
+        this.grabPowerup = game.add.audio('grabpowerup');
         this.powerupSpeed = 100;
+        
+        this.speedPowerups = game.add.group();
+        this.speedPowerups.enableBody = true;
+        this.speedPowerups.physicsBodyType = Phaser.Physics.ARCADE;
+        this.speedPowerups.createMultiple(5, 'pup-speed');
+        this.speedPowerups.setAll('outOfBoundsKill', true);
+        this.speedPowerups.setAll('checkWorldBounds', true);
+        this.speedPowerupsKilled = 0;
+
+        this.weaponPowerups = game.add.group();
+        this.weaponPowerups.enableBody = true;
+        this.weaponPowerups.physicsBodyType = Phaser.Physics.ARCADE;
+        this.weaponPowerups.createMultiple(5, 'pup-weapon');
+        this.weaponPowerups.setAll('outOfBoundsKill', true);
+        this.weaponPowerups.setAll('checkWorldBounds', true);
+        this.weaponPowerupsKilled = 0;
 
         // Bullets
         this.bullets = game.add.group();
@@ -128,8 +136,10 @@ playState = {
                                     this.end, null, this);
         game.physics.arcade.overlap(this.bullets, this.enemies,
                                     this.killEnemy, null, this);
-        game.physics.arcade.overlap(this.player, this.powerups,
+        game.physics.arcade.overlap(this.player, this.speedPowerups,
                                     this.addSpeed, null, this);
+        game.physics.arcade.overlap(this.player, this.weaponPowerups,
+                                    this.addWeapon, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
             this.player.body.velocity.x = -this.playerSpeed;
@@ -230,7 +240,12 @@ playState = {
         'use strict';
         var powerup;
         
-        powerup = this.powerups.getFirstExists(false);
+        if (game.rnd.integerInRange(1,2) === 1) {
+            powerup = this.speedPowerups.getFirstExists(false);
+        }
+        else {
+            powerup = this.weaponPowerups.getFirstExists(false);
+        }
 
         if (powerup) {
             powerup.reset(xPos, yPos);
@@ -240,9 +255,18 @@ playState = {
     addSpeed: function(player, powerup) {
         'use strict';
         powerup.kill();
-        this.grabpowerup.play();
+        this.grabPowerup.play();
         score += 15;
         this.playerSpeed += 20;
+    },
+    addWeapon: function(player, powerup) {
+        'use strict';
+        powerup.kill();
+        this.grabPowerup.play();
+        score += 15;
+        if (this.bulletTimeOffset > 100) {
+            this.bulletTimeOffset -= 20;
+        }
     },
     end: function() {
         'use strict';
