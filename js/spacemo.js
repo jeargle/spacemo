@@ -21,13 +21,15 @@ loadState = {
                                 {font: '30px Courier',
                                  fill: '#ffffff'});
         
-        // Load art assets
-        game.load.image('player', 'assets/square-red.png');
+        // Load images
+        game.load.image('player', 'assets/ship-red.png');
         game.load.image('enemy', 'assets/square-blue.png');
         game.load.image('pup-speed', 'assets/pup-green.png');
         game.load.image('pup-weapon', 'assets/pup-blue.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
+
+        // Load sound effects
         game.load.audio('explosion', 'assets/explosion.wav');
         game.load.audio('grabpowerup', 'assets/powerup.wav');
     },
