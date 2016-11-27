@@ -32,6 +32,8 @@ loadState = {
         // Load sound effects
         game.load.audio('explosion', 'assets/explosion.wav');
         game.load.audio('grabpowerup', 'assets/powerup.wav');
+        game.load.audio('fire1', 'assets/fire1.wav');
+        game.load.audio('fire2', 'assets/fire2.wav');
     },
     create: function() {
         'use strict';
@@ -124,6 +126,8 @@ playState = {
         this.bulletSpeed = 500;
 
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        this.fire1 = game.add.audio('fire1');
+        this.fire2 = game.add.audio('fire2');
 
         // Score
         score = 0;
@@ -174,6 +178,7 @@ playState = {
             bullet = this.bullets.getFirstExists(false);
 
             if (bullet) {
+                this.fire1.play();
                 bullet.reset(this.player.x + 14, this.player.y);
                 bullet.body.velocity.y = -this.bulletSpeed;
             }
@@ -272,6 +277,7 @@ playState = {
     },
     end: function() {
         'use strict';
+        this.explosion.play();
         game.state.start('end');
     }
 };
