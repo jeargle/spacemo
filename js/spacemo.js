@@ -25,6 +25,7 @@ loadState = {
         game.load.image('player', 'assets/ship-red.png');
         game.load.image('enemy', 'assets/square-blue.png');
         game.load.image('pup-speed', 'assets/pup-green.png');
+        game.load.image('pup-bullet', 'assets/pup-red.png');
         game.load.image('pup-weapon', 'assets/pup-blue.png');
         game.load.image('bullet', 'assets/bullet.png');
         game.load.image('background', 'assets/space-background.png');
@@ -103,6 +104,14 @@ playState = {
         this.speedPowerups.setAll('checkWorldBounds', true);
         this.speedPowerupsKilled = 0;
 
+        this.bulletPowerups = game.add.group();
+        this.bulletPowerups.enableBody = true;
+        this.bulletPowerups.physicsBodyType = Phaser.Physics.ARCADE;
+        this.bulletPowerups.createMultiple(5, 'pup-bullet');
+        this.bulletPowerups.setAll('outOfBoundsKill', true);
+        this.bulletPowerups.setAll('checkWorldBounds', true);
+        this.bulletPowerupsKilled = 0;
+
         this.weaponPowerups = game.add.group();
         this.weaponPowerups.enableBody = true;
         this.weaponPowerups.physicsBodyType = Phaser.Physics.ARCADE;
@@ -129,6 +138,8 @@ playState = {
         this.fire1 = game.add.audio('fire1');
         this.fire2 = game.add.audio('fire2');
 
+        this.gun = 1;   // which gun is currently active
+
         // Score
         score = 0;
         this.scoreText = game.add.text(600, 10, 'Score: ' + this.score,
@@ -144,6 +155,8 @@ playState = {
                                     this.killEnemy, null, this);
         game.physics.arcade.overlap(this.player, this.speedPowerups,
                                     this.addSpeed, null, this);
+        game.physics.arcade.overlap(this.player, this.bulletPowerups,
+                                    this.addBullet, null, this);
         game.physics.arcade.overlap(this.player, this.weaponPowerups,
                                     this.addWeapon, null, this);
 
@@ -171,16 +184,30 @@ playState = {
     },
     fire: function() {
         'use strict';
-        var bullet;
+        var bullet1, bullet2;
 
         if (game.time.now > this.bulletTime) {
-            this.bulletTime = game.time.now + this.bulletTimeOffset;
-            bullet = this.bullets.getFirstExists(false);
+            if (this.gun === 1) {
+                this.bulletTime = game.time.now + this.bulletTimeOffset;
+                bullet1 = this.bullets.getFirstExists(false);
 
-            if (bullet) {
-                this.fire1.play();
-                bullet.reset(this.player.x + 14, this.player.y);
-                bullet.body.velocity.y = -this.bulletSpeed;
+                if (bullet1) {
+                    this.fire1.play();
+                    bullet1.reset(this.player.x + 14, this.player.y);
+                    bullet1.body.velocity.y = -this.bulletSpeed;
+                }
+            }
+            else {
+                this.bulletTime = game.time.now + this.bulletTimeOffset;
+                this.fire2.play();
+
+                bullet1 = this.bullets.getFirstExists(false);
+                bullet1.reset(this.player.x + 2, this.player.y);
+                bullet1.body.velocity.y = -this.bulletSpeed;
+
+                bullet2 = this.bullets.getFirstExists(false);
+                bullet2.reset(this.player.x + 30, this.player.y);
+                bullet2.body.velocity.y = -this.bulletSpeed;
             }
         }
     },
@@ -245,10 +272,14 @@ playState = {
     },
     createPowerup: function(xPos, yPos) {
         'use strict';
-        var powerup;
-        
-        if (game.rnd.integerInRange(1,2) === 1) {
+        var powerup, rng;
+
+        rng = game.rnd.integerInRange(1,7);
+        if (rng <= 3) {
             powerup = this.speedPowerups.getFirstExists(false);
+        }
+        else if (rng >= 5) {
+            powerup = this.bulletPowerups.getFirstExists(false);
         }
         else {
             powerup = this.weaponPowerups.getFirstExists(false);
@@ -266,13 +297,23 @@ playState = {
         score += 15;
         this.playerSpeed += 20;
     },
-    addWeapon: function(player, powerup) {
+    addBullet: function(player, powerup) {
         'use strict';
         powerup.kill();
         this.grabPowerup.play();
         score += 15;
         if (this.bulletTimeOffset > 100) {
             this.bulletTimeOffset -= 20;
+        }
+    },
+    addWeapon: function(player, powerup) {
+        'use strict';
+        powerup.kill();
+        this.grabPowerup.play();
+        score += 15;
+        if (this.gun === 1) {
+            this.gun++;
+            this.bulletTimeOffset *= 2;
         }
     },
     end: function() {
