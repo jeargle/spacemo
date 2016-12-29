@@ -86,7 +86,6 @@ playState = {
         this.enemies.createMultiple(30, 'enemy');
         this.enemies.setAll('outOfBoundsKill', true);
         this.enemies.setAll('checkWorldBounds', true);
-        // this.createEnemies();
         this.enemiesKilled = 0;
         this.enemyTime = 0;
         this.enemyTimeOffset = 800;
@@ -231,31 +230,11 @@ playState = {
                     true, 0, 1000, true);
         }
     },
-    createEnemies: function() {
-        'use strict';
-        var i, j, enemy, tween;
-
-        for (i=0; i<4; i++) {
-            for (j=0; j<10; j++) {
-                enemy = this.enemies.create(j*50, i*50, 'enemy');
-                enemy.anchor.setTo(0.5, 0.5);
-            }
-        }
-
-        this.enemies.x = 50;
-        this.enemies.y = 100;
-
-        tween = game.add.tween(this.enemies)
-            .to({x: 300}, 4000,
-                Phaser.Easing.Linear.None,
-                true, 0, 1000, true);
-        // tween.onLoop.add(this.descend, this);
-        tween.onRepeat.add(this.descend, this);
-    },
-    descend: function() {
-        'use strict';
-        this.enemies.y += 15;
-    },
+    /**
+     * 
+     * @param bullet
+     * @param enemy
+     */
     killEnemy: function(bullet, enemy) {
         'use strict';
         var xPos, yPos;
@@ -271,6 +250,11 @@ playState = {
             this.createPowerup(xPos, yPos);
         }
     },
+    /**
+     * 
+     * @param xPos - x position of powerup location
+     * @param yPos - y position of powerup location
+     */
     createPowerup: function(xPos, yPos) {
         'use strict';
         var powerup, rng;
@@ -291,6 +275,11 @@ playState = {
             powerup.body.velocity.y = this.powerupSpeed;
         }
     },
+    /**
+     * Increase player's movement speed.
+     * @param player
+     * @param powerup
+     */
     addSpeed: function(player, powerup) {
         'use strict';
         powerup.kill();
@@ -298,6 +287,11 @@ playState = {
         score += 15;
         this.playerSpeed += 20;
     },
+    /**
+     * Increase player's firing rate.
+     * @param player
+     * @param powerup
+     */
     addBullet: function(player, powerup) {
         'use strict';
         powerup.kill();
@@ -307,6 +301,11 @@ playState = {
             this.bulletTimeOffset -= 20;
         }
     },
+    /**
+     * Add a second gun but halve the firing rate.
+     * @param player
+     * @param powerup
+     */
     addWeapon: function(player, powerup) {
         'use strict';
         powerup.kill();
