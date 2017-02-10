@@ -24,7 +24,7 @@ loadState = {
         
         // Load images
         game.load.image('player', 'assets/ship-red.png');
-        game.load.image('enemy', 'assets/square-blue.png');
+        game.load.image('enemy', 'assets/ray-blue.png');
         game.load.image('pup-speed', 'assets/pup-green.png');
         game.load.image('pup-bullet', 'assets/pup-red.png');
         game.load.image('pup-weapon', 'assets/pup-blue.png');
