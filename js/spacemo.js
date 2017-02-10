@@ -182,6 +182,9 @@ playState = {
 
         this.scoreText.text = 'Score: ' + score;
     },
+    /**
+     * Fire player's weapon.
+     */
     fire: function() {
         'use strict';
         var bullet1, bullet2;
@@ -211,6 +214,9 @@ playState = {
             }
         }
     },
+    /**
+     * Add a new enemy to the screen.
+     */
     dispatchEnemy: function() {
         'use strict';
         var enemy, tween, xPos;
@@ -231,7 +237,7 @@ playState = {
         }
     },
     /**
-     * 
+     * Kill an enemy.  Remove enemy and bullet and play death sound.
      * @param bullet
      * @param enemy
      */
@@ -251,9 +257,9 @@ playState = {
         }
     },
     /**
-     * 
-     * @param xPos - x position of powerup location
-     * @param yPos - y position of powerup location
+     * Make a new powerup at the given position.
+     * @param xPos - x position
+     * @param yPos - y position
      */
     createPowerup: function(xPos, yPos) {
         'use strict';
@@ -316,6 +322,9 @@ playState = {
             this.bulletTimeOffset *= 2;
         }
     },
+    /**
+     * Exit to game over screen.
+     */
     end: function() {
         'use strict';
         this.explosion.play();
@@ -353,6 +362,9 @@ endState = {
         wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
         wKey.onDown.addOnce(this.restart, this);
     },
+    /**
+     * Go back to title screen.
+     */
     restart: function() {
         'use strict';
         game.state.start('title');
