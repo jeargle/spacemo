@@ -1,7 +1,8 @@
-var score, bootState, loadState, titleState, playState, endState, game;
+var score, highscore, level, bootState, loadState, titleState, playState, levelState, endState, game;
 
 score = 0;
 highscore = 0;
+level = 1;
 
 bootState = {
     create: function() {
@@ -329,6 +330,27 @@ playState = {
         'use strict';
         this.explosion.play();
         game.state.start('end');
+    }
+};
+
+levelState = {
+    create: function() {
+        'use strict';
+        var nameLbl, startLbl, wKey;
+
+        nameLbl = game.add.text(80, 160, 'LEVEL ' + level + ' COMPLETE',
+                                {font: '50px Courier',
+                                 fill: '#ffffff'});
+        startLbl = game.add.text(80, 240, 'press "W" to start next level',
+                                 {font: '30px Courier',
+                                  fill: '#ffffff'});
+
+        wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        wKey.onDown.addOnce(this.start, this);
+    },
+    start: function() {
+        'use strict';
+        game.state.start('play');
     }
 };
 
