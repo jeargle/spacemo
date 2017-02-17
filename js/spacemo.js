@@ -1,8 +1,7 @@
-var score, highscore, level, bootState, loadState, titleState, playState, levelState, endState, game;
+var score, highscore, level, playerState, bootState, loadState, titleState, playState, levelState, endState, game;
 
-score = 0;
+
 highscore = 0;
-level = 1;
 
 bootState = {
     create: function() {
@@ -61,6 +60,16 @@ titleState = {
     },
     start: function() {
         'use strict';
+
+        // Reset game state
+        score = 0;
+        level = 0;
+        playerState = {
+            speed: 200,
+            bulletTimeOffset: 300,
+            gun: 1      // which gun is currently active
+        };
+        
         game.state.start('play');
     }
 };
@@ -78,7 +87,6 @@ playState = {
         // Player
         this.player = game.add.sprite(game.world.centerX, 500, 'player');
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
-        this.playerSpeed = 200;
 
         // Enemies
         this.enemies = game.add.group();
@@ -89,8 +97,8 @@ playState = {
         this.enemies.setAll('checkWorldBounds', true);
         this.enemiesKilled = 0;
         this.enemyTime = 0;
-        this.enemyTimeOffset = 800;
-        this.enemySpeed = 100;
+        this.enemyTimeOffset = 800 - (level*100);
+        this.enemySpeed = 100 + (level*10);
         this.explosion = game.add.audio('explosion');
 
         // Powerups
@@ -103,7 +111,6 @@ playState = {
         this.speedPowerups.createMultiple(5, 'pup-speed');
         this.speedPowerups.setAll('outOfBoundsKill', true);
         this.speedPowerups.setAll('checkWorldBounds', true);
-        this.speedPowerupsKilled = 0;
 
         this.bulletPowerups = game.add.group();
         this.bulletPowerups.enableBody = true;
@@ -111,7 +118,6 @@ playState = {
         this.bulletPowerups.createMultiple(5, 'pup-bullet');
         this.bulletPowerups.setAll('outOfBoundsKill', true);
         this.bulletPowerups.setAll('checkWorldBounds', true);
-        this.bulletPowerupsKilled = 0;
 
         this.weaponPowerups = game.add.group();
         this.weaponPowerups.enableBody = true;
@@ -119,7 +125,6 @@ playState = {
         this.weaponPowerups.createMultiple(5, 'pup-weapon');
         this.weaponPowerups.setAll('outOfBoundsKill', true);
         this.weaponPowerups.setAll('checkWorldBounds', true);
-        this.weaponPowerupsKilled = 0;
 
         // Bullets
         this.bullets = game.add.group();
@@ -132,18 +137,14 @@ playState = {
         this.bullets.setAll('checkWorldBounds', true);
         
         this.bulletTime = 0;
-        this.bulletTimeOffset = 300;
         this.bulletSpeed = 500;
 
         this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         this.fire1 = game.add.audio('fire1');
         this.fire2 = game.add.audio('fire2');
 
-        this.gun = 1;   // which gun is currently active
-
         // Score
-        score = 0;
-        this.scoreText = game.add.text(600, 10, 'Score: ' + this.score,
+        this.scoreText = game.add.text(600, 10, 'Score: ' + score,
                                        {font: '30px Courier',
                                         fill: '#ffffff'});
     },
@@ -162,10 +163,10 @@ playState = {
                                     this.addWeapon, null, this);
 
         if (this.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.body.velocity.x = -this.playerSpeed;
+            this.player.body.velocity.x = -playerState.speed;
         }
         else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.body.velocity.x = this.playerSpeed;
+            this.player.body.velocity.x = playerState.speed;
         }
         else {
             this.player.body.velocity.x = 0;
@@ -191,8 +192,8 @@ playState = {
         var bullet1, bullet2;
 
         if (game.time.now > this.bulletTime) {
-            if (this.gun === 1) {
-                this.bulletTime = game.time.now + this.bulletTimeOffset;
+            if (playerState.gun === 1) {
+                this.bulletTime = game.time.now + playerState.bulletTimeOffset;
                 bullet1 = this.bullets.getFirstExists(false);
 
                 if (bullet1) {
@@ -202,7 +203,7 @@ playState = {
                 }
             }
             else {
-                this.bulletTime = game.time.now + this.bulletTimeOffset;
+                this.bulletTime = game.time.now + playerState.bulletTimeOffset;
                 this.fire2.play();
 
                 bullet1 = this.bullets.getFirstExists(false);
@@ -253,6 +254,11 @@ playState = {
         this.explosion.play();
         score += 10;
         this.enemiesKilled++;
+
+        if (this.enemiesKilled === 10) {
+            game.state.start('level');
+        }
+
         if (game.rnd.integerInRange(1,10) === 10) {
             this.createPowerup(xPos, yPos);
         }
@@ -292,7 +298,7 @@ playState = {
         powerup.kill();
         this.grabPowerup.play();
         score += 15;
-        this.playerSpeed += 20;
+        playerState.speed += 20;
     },
     /**
      * Increase player's firing rate.
@@ -304,8 +310,8 @@ playState = {
         powerup.kill();
         this.grabPowerup.play();
         score += 15;
-        if (this.bulletTimeOffset > 100) {
-            this.bulletTimeOffset -= 20;
+        if (playerState.bulletTimeOffset > 100) {
+            playerState.bulletTimeOffset -= 20;
         }
     },
     /**
@@ -318,9 +324,9 @@ playState = {
         powerup.kill();
         this.grabPowerup.play();
         score += 15;
-        if (this.gun === 1) {
-            this.gun++;
-            this.bulletTimeOffset *= 2;
+        if (playerState.gun === 1) {
+            playerState.gun++;
+            playerState.bulletTimeOffset *= 2;
         }
     },
     /**
@@ -338,7 +344,7 @@ levelState = {
         'use strict';
         var nameLbl, startLbl, wKey;
 
-        nameLbl = game.add.text(80, 160, 'LEVEL ' + level + ' COMPLETE',
+        nameLbl = game.add.text(80, 160, 'LEVEL ' + (level+1) + ' COMPLETE',
                                 {font: '50px Courier',
                                  fill: '#ffffff'});
         startLbl = game.add.text(80, 240, 'press "W" to start next level',
@@ -350,6 +356,7 @@ levelState = {
     },
     start: function() {
         'use strict';
+        level += 1;
         game.state.start('play');
     }
 };
@@ -400,6 +407,7 @@ game.state.add('boot', bootState);
 game.state.add('load', loadState);
 game.state.add('title', titleState);
 game.state.add('play', playState);
+game.state.add('level', levelState);
 game.state.add('end', endState);
 
 game.state.start('boot');
