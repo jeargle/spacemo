@@ -4,37 +4,6 @@ var score, highscore, level, playerState, game;
 highscore = 0;
 
 
-// titleState = {
-//     create: function() {
-//         'use strict';
-//         var nameLbl, startLbl, wKey;
-
-//         nameLbl = game.add.text(80, 160, 'SPACEMO',
-//                                 {font: '50px Courier',
-//                                  fill: '#ffffff'});
-//         startLbl = game.add.text(80, 240, 'press "W" to start',
-//                                  {font: '30px Courier',
-//                                   fill: '#ffffff'});
-
-//         wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
-//         wKey.onDown.addOnce(this.start, this);
-//     },
-//     start: function() {
-//         'use strict';
-
-//         // Reset game state
-//         score = 0;
-//         level = 0;
-//         playerState = {
-//             speed: 200,
-//             bulletTimeOffset: 300,
-//             gun: 1      // which gun is currently active
-//         };
-
-//         game.state.start('play');
-//     }
-// };
-
 playState = {
     create: function() {
         'use strict';
@@ -137,7 +106,7 @@ playState = {
             this.fire();
         }
 
-        if (game.time.now > this.enemyTime) {
+        if (this.time.now > this.enemyTime) {
             this.dispatchEnemy();
         }
 
@@ -152,9 +121,9 @@ playState = {
         'use strict';
         var bullet1, bullet2;
 
-        if (game.time.now > this.bulletTime) {
+        if (this.time.now > this.bulletTime) {
             if (playerState.gun === 1) {
-                this.bulletTime = game.time.now + playerState.bulletTimeOffset;
+                this.bulletTime = this.time.now + playerState.bulletTimeOffset;
                 bullet1 = this.bullets.getFirstExists(false);
 
                 if (bullet1) {
@@ -164,7 +133,7 @@ playState = {
                 }
             }
             else {
-                this.bulletTime = game.time.now + playerState.bulletTimeOffset;
+                this.bulletTime = this.time.now + playerState.bulletTimeOffset;
                 this.fire2.play();
 
                 bullet1 = this.bullets.getFirstExists(false);
@@ -190,7 +159,7 @@ playState = {
             xPos = game.rnd.integerInRange(1,6)*100;
             enemy.reset(xPos, -30);
             enemy.body.velocity.y = this.enemySpeed;
-            this.enemyTime = game.time.now +
+            this.enemyTime = this.time.now +
                 this.enemyTimeOffset +
                 game.rnd.integerInRange(0,8)*200;
             tween = game.add.tween(enemy)
@@ -363,11 +332,6 @@ endState = {
 
 
 
-// game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-div');
-
-
-
-
 const bootScene = {
     key: 'boot',
     active: true,
@@ -491,12 +455,8 @@ const playScene = {
         this.background = this.add.tileSprite(0, 0, 800, 600, 'background');
         this.backgroundSpeed = 1;
 
-        this.keyboard = this.input.keyboard;
-
         // Player
-        // this.player = this.add.sprite(game.world.centerX, 500, 'player');
         this.player = this.physics.add.sprite(this.centerX, 500, 'player');
-        // game.physics.enable(this.player, Phaser.Physics.ARCADE);
 
         // Enemies
         // this.enemies = game.add.group();
@@ -554,46 +514,51 @@ const playScene = {
         this.bulletTime = 0;
         this.bulletSpeed = 500;
 
-        // this.fireButton = this.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        this.fireButton = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACEBAR);
-        // this.key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        // this.fire1 = this.add.audio('fire1');
-        // this.fire2 = this.add.audio('fire2');
-
         // Score
         this.scoreText = this.add.text(600, 10, 'Score: ' + score,
                                        {font: '30px Courier',
                                         fill: '#ffffff'});
+
+        // Controls
+        this.cursors = this.input.keyboard.addKeys({
+            'left': Phaser.Input.Keyboard.KeyCodes.A,
+            'right': Phaser.Input.Keyboard.KeyCodes.D,
+            'fire': Phaser.Input.Keyboard.KeyCodes.SPACE,
+        });
+
+        // this.fire1 = this.add.audio('fire1');
+        // this.fire2 = this.add.audio('fire2');
+
+        this.physics.add.overlap(this.player, this.enemies,
+                                 this.end, null, this);
+        this.physics.add.overlap(this.bullets, this.enemies,
+                                 this.killEnemy, null, this);
+        this.physics.add.overlap(this.player, this.speedPowerups,
+                                 this.addSpeed, null, this);
+        this.physics.add.overlap(this.player, this.bulletPowerups,
+                                 this.addBullet, null, this);
+        this.physics.add.overlap(this.player, this.weaponPowerups,
+                                 this.addWeapon, null, this);
+
     },
     update: function() {
         'use strict';
 
-        game.physics.arcade.overlap(this.player, this.enemies,
-                                    this.end, null, this);
-        game.physics.arcade.overlap(this.bullets, this.enemies,
-                                    this.killEnemy, null, this);
-        game.physics.arcade.overlap(this.player, this.speedPowerups,
-                                    this.addSpeed, null, this);
-        game.physics.arcade.overlap(this.player, this.bulletPowerups,
-                                    this.addBullet, null, this);
-        game.physics.arcade.overlap(this.player, this.weaponPowerups,
-                                    this.addWeapon, null, this);
-
-        if (this.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.body.velocity.x = -playerState.speed;
+        if (this.cursors.right.isDown) {
+            this.player.body.setVelocityX(-this.playerSpeed);
         }
-        else if (this.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.body.velocity.x = playerState.speed;
+        else if (this.cursors.left.isDown) {
+            this.player.body.setVelocityX(-this.playerSpeed);
         }
         else {
-            this.player.body.velocity.x = 0;
+            this.player.body.setVelocityX(0);
         }
 
-        if (this.fireButton.isDown) {
+        if (this.cursors.fire.isDown) {
             this.fire();
         }
 
-        if (game.time.now > this.enemyTime) {
+        if (this.time.now > this.enemyTime) {
             this.dispatchEnemy();
         }
 
@@ -609,9 +574,9 @@ const playScene = {
             'use strict';
             var bullet1, bullet2;
 
-            if (game.time.now > this.bulletTime) {
+            if (this.time.now > this.bulletTime) {
                 if (playerState.gun === 1) {
-                    this.bulletTime = game.time.now + playerState.bulletTimeOffset;
+                    this.bulletTime = this.time.now + playerState.bulletTimeOffset;
                     bullet1 = this.bullets.getFirstExists(false);
 
                     if (bullet1) {
@@ -622,7 +587,7 @@ const playScene = {
                     }
                 }
                 else {
-                    this.bulletTime = game.time.now + playerState.bulletTimeOffset;
+                    this.bulletTime = this.time.now + playerState.bulletTimeOffset;
                     // this.fire2.play();
                     this.sound.play('fire2');
 
@@ -649,7 +614,7 @@ const playScene = {
                 xPos = game.rnd.integerInRange(1,6)*100;
                 enemy.reset(xPos, -30);
                 enemy.body.velocity.y = this.enemySpeed;
-                this.enemyTime = game.time.now +
+                this.enemyTime = this.time.now +
                     this.enemyTimeOffset +
                     game.rnd.integerInRange(0,8)*200;
                 tween = game.add.tween(enemy)
