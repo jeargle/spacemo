@@ -1,78 +1,39 @@
-var score, highscore, level, playerState, bootState, loadState, titleState, playState, levelState, endState, game;
+var score, highscore, level, playerState, game;
 
 
 highscore = 0;
 
-bootState = {
-    create: function() {
-        'use strict';
 
-        // Load physics engine
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.state.start('load');
-    }
-};
+// titleState = {
+//     create: function() {
+//         'use strict';
+//         var nameLbl, startLbl, wKey;
 
-loadState = {
-    preload: function() {
-        'use strict';
-        var loadLbl;
+//         nameLbl = game.add.text(80, 160, 'SPACEMO',
+//                                 {font: '50px Courier',
+//                                  fill: '#ffffff'});
+//         startLbl = game.add.text(80, 240, 'press "W" to start',
+//                                  {font: '30px Courier',
+//                                   fill: '#ffffff'});
 
-        loadLbl = game.add.text(80, 160, 'loading...',
-                                {font: '30px Courier',
-                                 fill: '#ffffff'});
+//         wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
+//         wKey.onDown.addOnce(this.start, this);
+//     },
+//     start: function() {
+//         'use strict';
 
-        // Load images
-        game.load.image('player', 'assets/ship-red.png');
-        game.load.image('enemy', 'assets/ray-blue.png');
-        game.load.image('pup-speed', 'assets/pup-green.png');
-        game.load.image('pup-bullet', 'assets/pup-red.png');
-        game.load.image('pup-weapon', 'assets/pup-blue.png');
-        game.load.image('bullet', 'assets/bullet.png');
-        game.load.image('background', 'assets/space-background.png');
+//         // Reset game state
+//         score = 0;
+//         level = 0;
+//         playerState = {
+//             speed: 200,
+//             bulletTimeOffset: 300,
+//             gun: 1      // which gun is currently active
+//         };
 
-        // Load sound effects
-        game.load.audio('explosion', 'assets/explosion.wav');
-        game.load.audio('grabpowerup', 'assets/powerup.wav');
-        game.load.audio('fire1', 'assets/fire1.wav');
-        game.load.audio('fire2', 'assets/fire2.wav');
-    },
-    create: function() {
-        'use strict';
-        game.state.start('title');
-    }
-};
-
-titleState = {
-    create: function() {
-        'use strict';
-        var nameLbl, startLbl, wKey;
-
-        nameLbl = game.add.text(80, 160, 'SPACEMO',
-                                {font: '50px Courier',
-                                 fill: '#ffffff'});
-        startLbl = game.add.text(80, 240, 'press "W" to start',
-                                 {font: '30px Courier',
-                                  fill: '#ffffff'});
-
-        wKey = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        wKey.onDown.addOnce(this.start, this);
-    },
-    start: function() {
-        'use strict';
-
-        // Reset game state
-        score = 0;
-        level = 0;
-        playerState = {
-            speed: 200,
-            bulletTimeOffset: 300,
-            gun: 1      // which gun is currently active
-        };
-
-        game.state.start('play');
-    }
-};
+//         game.state.start('play');
+//     }
+// };
 
 playState = {
     create: function() {
@@ -404,14 +365,6 @@ endState = {
 
 // game = new Phaser.Game(800, 600, Phaser.AUTO, 'game-div');
 
-// game.state.add('boot', bootState);
-// game.state.add('load', loadState);
-// game.state.add('title', titleState);
-// game.state.add('play', playState);
-// game.state.add('level', levelState);
-// game.state.add('end', endState);
-
-// game.state.start('boot');
 
 
 
@@ -426,8 +379,7 @@ const bootScene = {
     },
     create: (config) => {
         console.log('[BOOT] create', config);
-        // Load physics engine
-        // game.physics.startSystem(Phaser.Physics.ARCADE);
+
         game.scene.start('load');
         game.scene.remove('boot');
     },
@@ -474,7 +426,7 @@ const loadScene = {
     create: function(config) {
         'use strict';
         console.log('[LOAD] create', config);
-        // game.state.start('title');
+
         game.scene.start('title');
         game.scene.remove('load');
     },
@@ -507,21 +459,14 @@ const titleScene = {
                                  {font: '30px Courier',
                                   fill: '#ffffff'});
 
-        // wKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
-        // wKey.onDown.addOnce(this.start, this);
-        // console.log(this);
-        // this.hey();
-        // console.log(this.start2);
         this.input.keyboard.on('keydown_W', this.start, this);
     },
     extend: {
-        hey: function() {
-            console.log('HEY 2');
-        },
         start: function() {
             'use strict';
 
             console.log('start');
+
             // Reset game state
             score = 0;
             level = 0;
@@ -531,7 +476,6 @@ const titleScene = {
                 gun: 1      // which gun is currently active
             };
 
-            // game.state.start('play');
             game.scene.start('play');
             game.scene.remove('title');
         }
@@ -839,7 +783,14 @@ const gameConfig = {
             y: -200
         }
     },
-    scene: [ bootScene, loadScene, titleScene, playScene ],
+    scene: [
+        bootScene,
+        loadScene,
+        titleScene,
+        playScene,
+        // levelScene,
+        // endScene
+    ],
 };
 
 game = new Phaser.Game(gameConfig);
