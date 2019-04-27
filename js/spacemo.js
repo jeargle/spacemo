@@ -1,4 +1,4 @@
-var score, highscore, level, playerState, game
+let score, highscore, level, playerState, game
 
 
 highscore = 0
@@ -120,7 +120,7 @@ playState = {
      */
     fire: function() {
         'use strict'
-        var bullet1, bullet2
+        let bullet1, bullet2
 
         if (this.time.now > this.bulletTime) {
             if (playerState.gun === 1) {
@@ -152,7 +152,7 @@ playState = {
      */
     dispatchEnemy: function() {
         'use strict'
-        var enemy, tween, xPos
+        let enemy, tween, xPos
 
         enemy = this.enemies.getFirstDead(false)
 
@@ -176,7 +176,7 @@ playState = {
      */
     killEnemy: function(bullet, enemy) {
         'use strict'
-        var xPos, yPos
+        let xPos, yPos
 
         xPos = enemy.position.x
         yPos = enemy.position.y
@@ -201,7 +201,7 @@ playState = {
      */
     createPowerup: function(xPos, yPos) {
         'use strict'
-        var powerup, rng
+        let powerup, rng
 
         rng = game.rnd.integerInRange(1,7)
         if (rng <= 3) {
@@ -273,7 +273,7 @@ playState = {
 levelState = {
     create: function() {
         'use strict'
-        var nameLbl, startLbl, wKey
+        let nameLbl, startLbl, wKey
 
         nameLbl = game.add.text(80, 160, 'LEVEL ' + (level+1) + ' COMPLETE',
                                 {font: '50px Courier',
@@ -295,7 +295,7 @@ levelState = {
 endState = {
     create: function() {
         'use strict'
-        var scoreLbl, nameLbl, startLbl, highscoreLbl, wKey
+        let scoreLbl, nameLbl, startLbl, highscoreLbl, wKey
 
         scoreLbl = game.add.text(600, 10, 'Score: ' + score,
                                  {font: '30px Courier',
@@ -367,7 +367,7 @@ const loadScene = {
     preload: function() {
         'use strict'
         console.log('[LOAD] preload')
-        var loadLbl
+        let loadLbl
 
         loadLbl = this.add.text(80, 160, 'loading...',
                                 {font: '30px Courier',
@@ -415,7 +415,7 @@ const titleScene = {
     create: function(config) {
         'use strict'
         console.log('[TITLE] create', config)
-        var nameLbl, startLbl, wKey
+        let nameLbl, startLbl, wKey
 
         nameLbl = this.add.text(80, 160, 'SPACEMO',
                                 {font: '50px Courier',
@@ -576,7 +576,7 @@ const playScene = {
          */
         fire: function() {
             'use strict'
-            var bullet1, bullet2
+            let bullet1, bullet2
 
             if (this.time.now > this.bulletTime) {
                 if (playerState.gun === 1) {
@@ -610,7 +610,7 @@ const playScene = {
          */
         dispatchEnemy: function() {
             'use strict'
-            var enemy, tween, xPos
+            let enemy, tween, xPos
 
             // enemy = this.enemies.getFirstExists(false)
             // enemy = this.enemies.getFirstAlive(false)
@@ -636,7 +636,7 @@ const playScene = {
          */
         killEnemy: function(bullet, enemy) {
             'use strict'
-            var xPos, yPos
+            let xPos, yPos
 
             xPos = enemy.position.x
             yPos = enemy.position.y
@@ -661,7 +661,7 @@ const playScene = {
          */
         createPowerup: function(xPos, yPos) {
             'use strict'
-            var powerup, rng
+            let powerup, rng
 
             rng = game.rnd.integerInRange(1,7)
             if (rng <= 3) {
