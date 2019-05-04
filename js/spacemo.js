@@ -333,38 +333,41 @@ endState = {
 
 
 
-const bootScene = {
-    key: 'boot',
-    active: true,
-    init: (config) => {
+class BootScene extends Phaser.Scene {
+    constructor() {
+        super('boot')
+    }
+
+    init(config) {
         console.log('[BOOT] init', config)
-    },
-    preload: () => {
+    }
+
+    preload() {
         console.log('[BOOT] preload')
-    },
-    create: (config) => {
-        console.log('[BOOT] create', config)
+    }
+
+    create() {
+        console.log('[BOOT] create')
 
         game.scene.start('load')
         game.scene.remove('boot')
-    },
-    update: () => {
+    }
+
+    update() {
         console.log('[BOOT] update')
     }
 }
 
-const loadScene = {
-    key: 'load',
-    // active: true,
-    renderToTexture: true,
-    x: 64,
-    y: 64,
-    width: 320,
-    height: 200,
-    init: (config) => {
+class LoadScene extends Phaser.Scene {
+    constructor() {
+        super('load')
+    }
+
+    init(config) {
         console.log('[LOAD] init', config)
-    },
-    preload: function() {
+    }
+
+    preload() {
         'use strict'
         console.log('[LOAD] preload')
         let loadLbl
@@ -387,35 +390,44 @@ const loadScene = {
         this.load.audio('grabpowerup', 'assets/powerup.wav')
         this.load.audio('fire1', 'assets/fire1.wav')
         this.load.audio('fire2', 'assets/fire2.wav')
-    },
-    create: function(config) {
+    }
+
+    create() {
         'use strict'
-        console.log('[LOAD] create', config)
+
+        console.log('[LOAD] create')
 
         game.scene.start('title')
         game.scene.remove('load')
-    },
-    update: () => {
+    }
+
+    update() {
         console.log('[LOAD] update')
     }
 }
 
-const titleScene = {
-    key: 'title',
-    // active: true,
-    init: (config) => {
+class TitleScene extends Phaser.Scene {
+    constructor() {
+        super('title')
+    }
+
+    init(config) {
         console.log('[TITLE] init', config)
-    },
-    preload: () => {
+    }
+
+    preload() {
         console.log('[TITLE] preload')
-    },
-    update: () => {
+    }
+
+    update() {
         console.log('[TITLE] update')
-    },
-    create: function(config) {
+    }
+
+    create() {
         'use strict'
-        console.log('[TITLE] create', config)
         let nameLbl, startLbl, wKey
+
+        console.log('[TITLE] create')
 
         nameLbl = this.add.text(80, 160, 'SPACEMO',
                                 {font: '50px Courier',
@@ -425,31 +437,33 @@ const titleScene = {
                                   fill: '#ffffff'})
 
         this.input.keyboard.on('keydown_W', this.start, this)
-    },
-    extend: {
-        start: function() {
-            'use strict'
+    }
 
-            console.log('start')
+    start() {
+        'use strict'
 
-            // Reset game state
-            score = 0
-            level = 0
-            playerState = {
-                speed: 200,
-                bulletTimeOffset: 300,
-                gun: 1      // which gun is currently active
-            }
+        console.log('start')
 
-            game.scene.start('play')
-            game.scene.remove('title')
+        // Reset game state
+        score = 0
+        level = 0
+        playerState = {
+            speed: 200,
+            bulletTimeOffset: 300,
+            gun: 1      // which gun is currently active
         }
+
+        game.scene.start('play')
+        game.scene.remove('title')
     }
 }
 
-const playScene = {
-    key: 'play',
-    create: function(config) {
+class PlayScene extends Phaser.Scene {
+    constructor() {
+        super('play')
+    }
+
+    create() {
         'use strict'
 
         // Background
@@ -543,8 +557,9 @@ const playScene = {
         this.physics.add.overlap(this.player, this.weaponPowerups,
                                  this.addWeapon, null, this)
 
-    },
-    update: function() {
+    }
+
+    update() {
         'use strict'
 
         if (this.cursors.right.isDown) {
@@ -569,169 +584,175 @@ const playScene = {
         // this.background.y += this.backgroundSpeed
 
         this.scoreText.text = 'Score: ' + score
-    },
-    extend: {
-        /**
-         * Fire player's weapon.
-         */
-        fire: function() {
-            'use strict'
-            let bullet1, bullet2
+    }
 
-            if (this.time.now > this.bulletTime) {
-                if (playerState.gun === 1) {
-                    this.bulletTime = this.time.now + playerState.bulletTimeOffset
-                    bullet1 = this.bullets.getFirstDead(false)
+    /**
+     * Fire player's weapon.
+     */
+    fire() {
+        'use strict'
+        let bullet1, bullet2
 
-                    if (bullet1) {
-                        // this.fire1.play()
-                        this.sound.play('fire1')
-                        bullet1.reset(this.player.x + 14, this.player.y)
-                        bullet1.body.velocity.y = -this.bulletSpeed
-                    }
-                }
-                else {
-                    this.bulletTime = this.time.now + playerState.bulletTimeOffset
-                    // this.fire2.play()
-                    this.sound.play('fire2')
+        if (this.time.now > this.bulletTime) {
+            if (playerState.gun === 1) {
+                this.bulletTime = this.time.now + playerState.bulletTimeOffset
+                bullet1 = this.bullets.getFirstDead(false)
 
-                    bullet1 = this.bullets.getFirstDead(false)
-                    bullet1.reset(this.player.x + 2, this.player.y)
+                if (bullet1) {
+                    // this.fire1.play()
+                    this.sound.play('fire1')
+                    bullet1.reset(this.player.x + 14, this.player.y)
                     bullet1.body.velocity.y = -this.bulletSpeed
-
-                    bullet2 = this.bullets.getFirstDead(false)
-                    bullet2.reset(this.player.x + 30, this.player.y)
-                    bullet2.body.velocity.y = -this.bulletSpeed
                 }
-            }
-        },
-        /**
-         * Add a new enemy to the screen.
-         */
-        dispatchEnemy: function() {
-            'use strict'
-            let enemy, tween, xPos
-
-            // enemy = this.enemies.getFirstExists(false)
-            // enemy = this.enemies.getFirstAlive(false)
-            enemy = this.enemies.getFirstDead(false)
-
-            if (enemy) {
-                xPos = game.rnd.integerInRange(1,6)*100
-                enemy.reset(xPos, -30)
-                enemy.body.velocity.y = this.enemySpeed
-                this.enemyTime = this.time.now +
-                    this.enemyTimeOffset +
-                    game.rnd.integerInRange(0,8)*200
-                tween = game.add.tween(enemy)
-                    .to({x: xPos+50}, 1500,
-                        Phaser.Easing.Linear.None,
-                        true, 0, 1000, true)
-            }
-        },
-        /**
-         * Kill an enemy.  Remove enemy and bullet and play death sound.
-         * @param bullet
-         * @param enemy
-         */
-        killEnemy: function(bullet, enemy) {
-            'use strict'
-            let xPos, yPos
-
-            xPos = enemy.position.x
-            yPos = enemy.position.y
-            bullet.kill()
-            enemy.kill()
-            this.sound.play('explosion')
-            score += 10
-            this.enemiesKilled++
-
-            if (this.enemiesKilled === 10) {
-                game.state.start('level')
-            }
-
-            if (game.rnd.integerInRange(1,10) === 10) {
-                this.createPowerup(xPos, yPos)
-            }
-        },
-        /**
-         * Make a new powerup at the given position.
-         * @param xPos - x position
-         * @param yPos - y position
-         */
-        createPowerup: function(xPos, yPos) {
-            'use strict'
-            let powerup, rng
-
-            rng = game.rnd.integerInRange(1,7)
-            if (rng <= 3) {
-                powerup = this.speedPowerups.getFirstDead(false)
-            }
-            else if (rng >= 5) {
-                powerup = this.bulletPowerups.getFirstDead(false)
             }
             else {
-                powerup = this.weaponPowerups.getFirstDead(false)
-            }
+                this.bulletTime = this.time.now + playerState.bulletTimeOffset
+                // this.fire2.play()
+                this.sound.play('fire2')
 
-            if (powerup) {
-                powerup.reset(xPos, yPos)
-                powerup.body.velocity.y = this.powerupSpeed
+                bullet1 = this.bullets.getFirstDead(false)
+                bullet1.reset(this.player.x + 2, this.player.y)
+                bullet1.body.velocity.y = -this.bulletSpeed
+
+                bullet2 = this.bullets.getFirstDead(false)
+                bullet2.reset(this.player.x + 30, this.player.y)
+                bullet2.body.velocity.y = -this.bulletSpeed
             }
-        },
-        /**
-         * Increase player's movement speed.
-         * @param player
-         * @param powerup
-         */
-        addSpeed: function(player, powerup) {
-            'use strict'
-            powerup.kill()
-            // this.grabPowerup.play()
-            this.sound.play('grabPowerup')
-            score += 15
-            playerState.speed += 20
-        },
-        /**
-         * Increase player's firing rate.
-         * @param player
-         * @param powerup
-         */
-        addBullet: function(player, powerup) {
-            'use strict'
-            powerup.kill()
-            // this.grabPowerup.play()
-            this.sound.play('grabPowerup')
-            score += 15
-            if (playerState.bulletTimeOffset > 100) {
-                playerState.bulletTimeOffset -= 20
-            }
-        },
-        /**
-         * Add a second gun but halve the firing rate.
-         * @param player
-         * @param powerup
-         */
-        addWeapon: function(player, powerup) {
-            'use strict'
-            powerup.kill()
-            // this.grabPowerup.play()
-            this.sound.play('grabPowerup')
-            score += 15
-            if (playerState.gun === 1) {
-                playerState.gun++
-                playerState.bulletTimeOffset *= 2
-            }
-        },
-        /**
-         * Exit to game over screen.
-         */
-        end: function() {
-            'use strict'
-            // this.explosion.play()
-            this.sound.play('explosion')
-            game.state.start('end')
         }
+    }
+
+    /**
+     * Add a new enemy to the screen.
+     */
+    dispatchEnemy() {
+        'use strict'
+        let enemy, tween, xPos
+
+        // enemy = this.enemies.getFirstExists(false)
+        // enemy = this.enemies.getFirstAlive(false)
+        enemy = this.enemies.getFirstDead(false)
+
+        if (enemy) {
+            xPos = game.rnd.integerInRange(1,6)*100
+            enemy.reset(xPos, -30)
+            enemy.body.velocity.y = this.enemySpeed
+            this.enemyTime = this.time.now +
+                this.enemyTimeOffset +
+                game.rnd.integerInRange(0,8)*200
+            tween = game.add.tween(enemy)
+                .to({x: xPos+50}, 1500,
+                    Phaser.Easing.Linear.None,
+                    true, 0, 1000, true)
+        }
+    }
+
+    /**
+     * Kill an enemy.  Remove enemy and bullet and play death sound.
+     * @param bullet
+     * @param enemy
+     */
+    killEnemy(bullet, enemy) {
+        'use strict'
+        let xPos, yPos
+
+        xPos = enemy.position.x
+        yPos = enemy.position.y
+        bullet.kill()
+        enemy.kill()
+        this.sound.play('explosion')
+        score += 10
+        this.enemiesKilled++
+
+        if (this.enemiesKilled === 10) {
+            game.state.start('level')
+        }
+
+        if (game.rnd.integerInRange(1,10) === 10) {
+            this.createPowerup(xPos, yPos)
+        }
+    }
+
+    /**
+     * Make a new powerup at the given position.
+     * @param xPos - x position
+     * @param yPos - y position
+     */
+    createPowerup(xPos, yPos) {
+        'use strict'
+        let powerup, rng
+
+        rng = game.rnd.integerInRange(1,7)
+        if (rng <= 3) {
+            powerup = this.speedPowerups.getFirstDead(false)
+        }
+        else if (rng >= 5) {
+            powerup = this.bulletPowerups.getFirstDead(false)
+        }
+        else {
+            powerup = this.weaponPowerups.getFirstDead(false)
+        }
+
+        if (powerup) {
+            powerup.reset(xPos, yPos)
+            powerup.body.velocity.y = this.powerupSpeed
+        }
+    }
+
+    /**
+     * Increase player's movement speed.
+     * @param player
+     * @param powerup
+     */
+    addSpeed(player, powerup) {
+        'use strict'
+        powerup.kill()
+        // this.grabPowerup.play()
+        this.sound.play('grabPowerup')
+        score += 15
+        playerState.speed += 20
+    }
+
+    /**
+     * Increase player's firing rate.
+     * @param player
+     * @param powerup
+     */
+    addBullet(player, powerup) {
+        'use strict'
+        powerup.kill()
+        // this.grabPowerup.play()
+        this.sound.play('grabPowerup')
+        score += 15
+        if (playerState.bulletTimeOffset > 100) {
+            playerState.bulletTimeOffset -= 20
+        }
+    }
+
+    /**
+     * Add a second gun but halve the firing rate.
+     * @param player
+     * @param powerup
+     */
+    addWeapon(player, powerup) {
+        'use strict'
+        powerup.kill()
+        // this.grabPowerup.play()
+        this.sound.play('grabPowerup')
+        score += 15
+        if (playerState.gun === 1) {
+            playerState.gun++
+            playerState.bulletTimeOffset *= 2
+        }
+    }
+
+    /**
+     * Exit to game over screen.
+     */
+    end() {
+        'use strict'
+        // this.explosion.play()
+        this.sound.play('explosion')
+        game.state.start('end')
     }
 }
 
@@ -757,10 +778,10 @@ const gameConfig = {
         }
     },
     scene: [
-        bootScene,
-        loadScene,
-        titleScene,
-        playScene,
+        BootScene,
+        LoadScene,
+        TitleScene,
+        PlayScene,
         // levelScene,
         // endScene
     ],
