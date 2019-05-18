@@ -562,11 +562,15 @@ class PlayScene extends Phaser.Scene {
     update() {
         'use strict'
 
+        // console.log('[PLAY] update')
+
         if (this.cursors.right.isDown) {
-            this.player.body.setVelocityX(-this.playerSpeed)
+            console.log('RIGHT')
+            this.player.body.setVelocityX(playerState.speed)
         }
         else if (this.cursors.left.isDown) {
-            this.player.body.setVelocityX(-this.playerSpeed)
+            console.log('LEFT')
+            this.player.body.setVelocityX(-playerState.speed)
         }
         else {
             this.player.body.setVelocityX(0)
@@ -592,6 +596,8 @@ class PlayScene extends Phaser.Scene {
     fire() {
         'use strict'
         let bullet1, bullet2
+
+        console.log('FIRE')
 
         if (this.time.now > this.bulletTime) {
             if (playerState.gun === 1) {
