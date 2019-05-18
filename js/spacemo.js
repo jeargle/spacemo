@@ -189,11 +189,16 @@ class PlayScene extends Phaser.Scene {
         // this.weaponPowerups.setAll('checkWorldBounds', true)
 
         // Bullets
-        // this.bullets = game.add.group()
-        this.bullets = this.physics.add.group()
-        this.bullets.enableBody = true
-        // this.bullets.physicsBodyType = Phaser.Physics.ARCADE
-        this.bullets.createMultiple(30, 'bullet')
+        this.bullets = this.physics.add.group({
+            key: 'bullet',
+            active: false,
+            repeat: 30,
+            setXY: { x: 0, y: -50, stepX: 50 }
+        })
+        let bullets = this.bullets
+        bullets.children.iterate(function(bullet) {
+            bullets.killAndHide(bullet)
+        })
         // this.bullets.setAll('anchor.x', 0.5)
         // this.bullets.setAll('anchor.y', 1)
         // this.bullets.setAll('outOfBoundsKill', true)
@@ -216,6 +221,8 @@ class PlayScene extends Phaser.Scene {
 
         // this.fire1 = this.add.audio('fire1')
         // this.fire2 = this.add.audio('fire2')
+        this.fire1 = this.sound.add('fire1')
+        this.fire2 = this.sound.add('fire2')
 
         this.physics.add.overlap(this.player, this.enemies,
                                  this.end, null, this)
@@ -236,11 +243,9 @@ class PlayScene extends Phaser.Scene {
         // console.log('[PLAY] update')
 
         if (this.cursors.right.isDown) {
-            console.log('RIGHT')
             this.player.body.setVelocityX(playerState.speed)
         }
         else if (this.cursors.left.isDown) {
-            console.log('LEFT')
             this.player.body.setVelocityX(-playerState.speed)
         }
         else {
@@ -276,23 +281,24 @@ class PlayScene extends Phaser.Scene {
                 bullet1 = this.bullets.getFirstDead(false)
 
                 if (bullet1) {
-                    // this.fire1.play()
-                    this.sound.play('fire1')
-                    bullet1.reset(this.player.x + 14, this.player.y)
+                    this.fire1.play()
+                    // this.sound.play('fire1')
+                    // bullet1.reset(this.player.x + 14, this.player.y)
+                    bullet1.setPosition(this.player.x, this.player.y - 14)
                     bullet1.body.velocity.y = -this.bulletSpeed
                 }
             }
             else {
                 this.bulletTime = this.time.now + playerState.bulletTimeOffset
-                // this.fire2.play()
-                this.sound.play('fire2')
+                this.fire2.play()
+                // this.sound.play('fire2')
 
                 bullet1 = this.bullets.getFirstDead(false)
-                bullet1.reset(this.player.x + 2, this.player.y)
+                bullet1.setPosition(this.player.x + 2, this.player.y)
                 bullet1.body.velocity.y = -this.bulletSpeed
 
                 bullet2 = this.bullets.getFirstDead(false)
-                bullet2.reset(this.player.x + 30, this.player.y)
+                bullet2.setPosition(this.player.x + 30, this.player.y)
                 bullet2.body.velocity.y = -this.bulletSpeed
             }
         }
@@ -311,7 +317,7 @@ class PlayScene extends Phaser.Scene {
 
         if (enemy) {
             xPos = game.rnd.integerInRange(1,6)*100
-            enemy.reset(xPos, -30)
+            enemy.setPosition(xPos, -30)
             enemy.body.velocity.y = this.enemySpeed
             this.enemyTime = this.time.now +
                 this.enemyTimeOffset +
@@ -370,7 +376,7 @@ class PlayScene extends Phaser.Scene {
         }
 
         if (powerup) {
-            powerup.reset(xPos, yPos)
+            powerup.setPosition(xPos, yPos)
             powerup.body.velocity.y = this.powerupSpeed
         }
     }
@@ -442,10 +448,7 @@ const gameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
-            // gravity: {
-            //     y: 600
-            // },
+            // debug: true,
             // height: 775,
             // width: 1600,
             height: 600,
