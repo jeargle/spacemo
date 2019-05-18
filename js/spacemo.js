@@ -137,31 +137,38 @@ class PlayScene extends Phaser.Scene {
     create() {
         'use strict'
 
+        let that = this
+
         // Background
-        this.background = this.add.tileSprite(0, 0, 800, 600, 'background')
+        this.background = this.add.tileSprite(400, 300, 800, 600, 'background')
         this.backgroundSpeed = 1
 
         // Player
-        // this.player = this.physics.add.sprite(this.centerX, 500, 'player')
         this.player = this.physics.add.sprite(400, 500, 'player')
         this.player.setCollideWorldBounds(true)
 
         // Enemies
-        // this.enemies = game.add.group()
-        this.enemies = this.physics.add.group()
-        this.enemies.enableBody = true
-        // this.enemies.physicsBodyType = Phaser.Physics.ARCADE
-        this.enemies.createMultiple(30, 'enemy')
-        // this.enemies.setAll('outOfBoundsKill', true)
-        // this.enemies.setAll('checkWorldBounds', true)
+        this.enemies = this.physics.add.group({
+            key: 'enemy',
+            active: false,
+            repeat: 30,
+            setXY: { x: 0, y: -100 },
+        })
+        let enemies = this.enemies
+        enemies.children.iterate(function(enemy) {
+            enemies.killAndHide(enemy)
+            enemy.body.onWorldBounds = true
+            // enemy.body.collideWorldBounds = true
+        })
+
         this.enemiesKilled = 0
         this.enemyTime = 0
         this.enemyTimeOffset = 800 - (level*100)
         this.enemySpeed = 100 + (level*10)
-        // this.explosion = this.add.audio('explosion')
+        this.explosion = this.sound.add('explosion')
 
         // Powerups
-        // this.grabPowerup = this.add.audio('grabpowerup')
+        this.grabPowerup = this.sound.add('grabpowerup')
         this.powerupSpeed = 100
 
         // this.speedPowerups = game.add.group()
@@ -193,14 +200,14 @@ class PlayScene extends Phaser.Scene {
             key: 'bullet',
             active: false,
             repeat: 30,
-            setXY: { x: 0, y: -50, stepX: 50 }
+            setXY: { x: 0, y: -200},
         })
         let bullets = this.bullets
         bullets.children.iterate(function(bullet) {
             bullets.killAndHide(bullet)
+            bullet.body.onWorldBounds = true
+            // bullet.body.collideWorldBounds = true
         })
-        // this.bullets.setAll('anchor.x', 0.5)
-        // this.bullets.setAll('anchor.y', 1)
         // this.bullets.setAll('outOfBoundsKill', true)
         // this.bullets.setAll('checkWorldBounds', true)
 
@@ -219,14 +226,14 @@ class PlayScene extends Phaser.Scene {
             'fire': Phaser.Input.Keyboard.KeyCodes.SPACE,
         })
 
-        // this.fire1 = this.add.audio('fire1')
-        // this.fire2 = this.add.audio('fire2')
         this.fire1 = this.sound.add('fire1')
         this.fire2 = this.sound.add('fire2')
 
         this.physics.add.overlap(this.player, this.enemies,
                                  this.end, null, this)
-        this.physics.add.overlap(this.bullets, this.enemies,
+        // this.physics.add.overlap(this.bullets, this.enemies,
+        //                          this.killEnemy, null, this)
+        this.physics.add.collider(this.bullets, this.enemies,
                                  this.killEnemy, null, this)
         this.physics.add.overlap(this.player, this.speedPowerups,
                                  this.addSpeed, null, this)
@@ -234,7 +241,15 @@ class PlayScene extends Phaser.Scene {
                                  this.addBullet, null, this)
         this.physics.add.overlap(this.player, this.weaponPowerups,
                                  this.addWeapon, null, this)
-
+        this.physics.world.on('worldbounds', function(body) {
+            console.log('WORLD BOUNDS')
+            // console.log(body)
+            that.removeBullet(body.gameObject)
+            // body.collideWorldBounds = false
+            // gameObject.setActive(false)
+            // gameObject.setVisible(false)
+            // gameObject.setPosition(0, -200)
+        })
     }
 
     update() {
@@ -273,17 +288,18 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         let bullet1, bullet2
 
-        console.log('FIRE')
+        // console.log('FIRE')
 
         if (this.time.now > this.bulletTime) {
             if (playerState.gun === 1) {
                 this.bulletTime = this.time.now + playerState.bulletTimeOffset
                 bullet1 = this.bullets.getFirstDead(false)
+                bullet1.active = true
+                bullet1.visible = true
+                bullet1.body.collideWorldBounds = true
 
                 if (bullet1) {
                     this.fire1.play()
-                    // this.sound.play('fire1')
-                    // bullet1.reset(this.player.x + 14, this.player.y)
                     bullet1.setPosition(this.player.x, this.player.y - 14)
                     bullet1.body.velocity.y = -this.bulletSpeed
                 }
@@ -291,14 +307,19 @@ class PlayScene extends Phaser.Scene {
             else {
                 this.bulletTime = this.time.now + playerState.bulletTimeOffset
                 this.fire2.play()
-                // this.sound.play('fire2')
 
                 bullet1 = this.bullets.getFirstDead(false)
-                bullet1.setPosition(this.player.x + 2, this.player.y)
+                bullet1.active = true
+                bullet1.visible = true
+                bullet1.body.collideWorldBounds = true
+                bullet1.setPosition(this.player.x - 14, this.player.y - 14)
                 bullet1.body.velocity.y = -this.bulletSpeed
 
                 bullet2 = this.bullets.getFirstDead(false)
-                bullet2.setPosition(this.player.x + 30, this.player.y)
+                bullet2.active = true
+                bullet2.visible = true
+                bullet2.body.collideWorldBounds = true
+                bullet2.setPosition(this.player.x + 14, this.player.y - 14)
                 bullet2.body.velocity.y = -this.bulletSpeed
             }
         }
@@ -311,21 +332,26 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         let enemy, tween, xPos
 
-        // enemy = this.enemies.getFirstExists(false)
-        // enemy = this.enemies.getFirstAlive(false)
         enemy = this.enemies.getFirstDead(false)
+        enemy.active = true
+        enemy.visible = true
 
         if (enemy) {
-            xPos = game.rnd.integerInRange(1,6)*100
+            xPos = Phaser.Math.Between(1,6)*100
             enemy.setPosition(xPos, -30)
+            enemy.body.velocity.x = 0
             enemy.body.velocity.y = this.enemySpeed
             this.enemyTime = this.time.now +
                 this.enemyTimeOffset +
-                game.rnd.integerInRange(0,8)*200
-            tween = game.add.tween(enemy)
-                .to({x: xPos+50}, 1500,
-                    Phaser.Easing.Linear.None,
-                    true, 0, 1000, true)
+                Phaser.Math.Between(0,8)*200
+            tween = this.tweens.add({
+                targets: enemy,
+                x: xPos + 50,              // '+=100'
+                ease: 'Linear',          // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 1000,
+                repeat: -1,              // -1: infinity
+                yoyo: true
+            })
         }
     }
 
@@ -338,21 +364,60 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         let xPos, yPos
 
-        xPos = enemy.position.x
-        yPos = enemy.position.y
-        bullet.kill()
-        enemy.kill()
+        console.log('KILL')
+        // console.log(enemy)
+        if (!enemy.active) {
+            return
+        }
+
+        this.removeBullet(bullet)
+        // this.enemies.killAndHide(enemy)
+        xPos = enemy.x
+        yPos = enemy.y
+        this.removeEnemy(enemy)
+        // enemy.setVisible(false)
+        // enemy.setActive(false)
+        console.log('bullets active: ' + this.bullets.countActive())
+        // enemy.disableBody(true, true)
+        // enemy.setPosition(0, -1500)
         this.sound.play('explosion')
         score += 10
         this.enemiesKilled++
-
-        if (this.enemiesKilled === 10) {
+        console.log('  ' + this.enemiesKilled)
+        if (this.enemiesKilled === 100) {
             game.state.start('level')
         }
 
-        if (game.rnd.integerInRange(1,10) === 10) {
+        if (Phaser.Math.Between(1,10) === 10) {
             this.createPowerup(xPos, yPos)
         }
+    }
+
+    removeEnemy(enemy) {
+        'use strict'
+
+        enemy.body.collideWorldBounds = false
+        enemy.setActive(false)
+        enemy.setVisible(false)
+        this.tweens.killTweensOf(enemy)
+        enemy.setPosition(0, -100)
+    }
+
+    removeBullet(bullet) {
+        'use strict'
+
+        // bullet.active = false
+        // bullet.visible = false
+        // enemy.active = false
+        // enemy.visible = false
+        // bullet.setActive(false)
+        // bullet.setVisible(false)
+        // bullet.setActive(false)
+        // bullet.setVisible(false)
+        bullet.body.collideWorldBounds = false
+        bullet.setActive(false)
+        bullet.setVisible(false)
+        bullet.setPosition(0, -200)
     }
 
     /**
@@ -364,7 +429,7 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         let powerup, rng
 
-        rng = game.rnd.integerInRange(1,7)
+        rng = Phaser.Math.Between(1,7)
         if (rng <= 3) {
             powerup = this.speedPowerups.getFirstDead(false)
         }
@@ -448,13 +513,9 @@ const gameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            // debug: true,
-            // height: 775,
-            // width: 1600,
-            height: 600,
+            debug: true,
             width: 800,
-            x: 0,
-            y: -200
+            height: 600,
         }
     },
     scene: [
