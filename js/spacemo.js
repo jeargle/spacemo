@@ -117,7 +117,7 @@ class TitleScene extends Phaser.Scene {
 
         // Reset game state
         score = 0
-        level = 0
+        level = 1
         playerState = {
             speed: 200,
             bulletTimeOffset: 300,
@@ -158,13 +158,12 @@ class PlayScene extends Phaser.Scene {
         enemies.children.iterate(function(enemy) {
             enemies.killAndHide(enemy)
             enemy.body.onWorldBounds = true
-            // enemy.body.collideWorldBounds = true
         })
 
         this.enemiesKilled = 0
         this.enemyTime = 0
-        this.enemyTimeOffset = 800 - (level*100)
-        this.enemySpeed = 100 + (level*10)
+        this.enemyTimeOffset = 900 - (level*100)
+        this.enemySpeed = 90 + (level*10)
         this.explosion = this.sound.add('explosion')
 
         // Powerups
@@ -206,10 +205,7 @@ class PlayScene extends Phaser.Scene {
         bullets.children.iterate(function(bullet) {
             bullets.killAndHide(bullet)
             bullet.body.onWorldBounds = true
-            // bullet.body.collideWorldBounds = true
         })
-        // this.bullets.setAll('outOfBoundsKill', true)
-        // this.bullets.setAll('checkWorldBounds', true)
 
         this.bulletTime = 0
         this.bulletSpeed = 500
@@ -365,27 +361,38 @@ class PlayScene extends Phaser.Scene {
         let xPos, yPos
 
         console.log('KILL')
-        // console.log(enemy)
+
         if (!enemy.active) {
             return
         }
 
         this.removeBullet(bullet)
-        // this.enemies.killAndHide(enemy)
+
         xPos = enemy.x
         yPos = enemy.y
         this.removeEnemy(enemy)
-        // enemy.setVisible(false)
-        // enemy.setActive(false)
-        console.log('bullets active: ' + this.bullets.countActive())
-        // enemy.disableBody(true, true)
-        // enemy.setPosition(0, -1500)
+
         this.sound.play('explosion')
         score += 10
         this.enemiesKilled++
+
+        console.log('bullets active: ' + this.bullets.countActive())
         console.log('  ' + this.enemiesKilled)
-        if (this.enemiesKilled === 100) {
-            game.state.start('level')
+
+        if (this.enemiesKilled === 5) {
+            // game.scene.start('level')
+
+        this.registry.destroy()
+        this.events.off()
+        game.scene.switch('play', 'level')
+        this.cursors.right.isDown = false
+        this.cursors.left.isDown = false
+        // this.cursors.up.isDown = false
+        // this.cursors.down.isDown = false
+        console.log('[PLAY] CURSORS OFF')
+        this.scene.stop()
+
+
         }
 
         if (Phaser.Math.Between(1,10) === 10) {
@@ -500,7 +507,98 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         // this.explosion.play()
         this.sound.play('explosion')
-        game.state.start('end')
+        // game.scene.start('end')
+
+        console.log('[PLAY] end')
+        this.registry.destroy()
+        this.events.off()
+        game.scene.switch('play', 'end')
+        this.cursors.right.isDown = false
+        this.cursors.left.isDown = false
+        // this.cursors.up.isDown = false
+        // this.cursors.down.isDown = false
+        console.log('[PLAY] CURSORS OFF')
+        this.scene.stop()
+    }
+}
+
+
+class LevelScene extends Phaser.Scene {
+    constructor() {
+        super('level')
+    }
+
+    create() {
+        'use strict'
+        let that, startLbl
+
+        console.log('[LEVEL] create')
+
+        that = this
+        this.nameLbl = this.add.text(80, 160, 'LEVEL ' + level + ' COMPLETE',
+                                     {font: '50px Courier',
+                                      fill: '#ffffff'})
+        startLbl = this.add.text(80, 240, 'press "W" to start next level',
+                                 {font: '30px Courier',
+                                  fill: '#ffffff'})
+
+        this.input.keyboard.on('keydown_W', this.start, this)
+
+        this.events.on('wake', function() {
+            // console.log('[LEVEL] wake')
+            that.nameLbl.text = 'LEVEL ' + level + ' COMPLETE'
+        })
+    }
+
+    start() {
+        'use strict'
+        level += 1
+        game.scene.switch('level', 'play')
+    }
+}
+
+class EndScene extends Phaser.Scene {
+    constructor() {
+        super('end')
+    }
+
+    create() {
+        'use strict'
+        let scoreLbl, nameLbl, startLbl, highscoreLbl, wKey
+
+        scoreLbl = this.add.text(600, 10, 'Score: ' + score,
+                                 {font: '30px Courier',
+                                  fill: '#ffffff'})
+        nameLbl = this.add.text(80, 160, 'YOU DIED',
+                                {font: '50px Courier',
+                                 fill: '#ffffff'})
+        startLbl = this.add.text(80, 240, 'press "W" to restart',
+                                 {font: '30px Courier',
+                                  fill: '#ffffff'})
+
+        if (score <= highscore) {
+            highscoreLbl = this.add.text(510, 50, 'High Score: ' + highscore,
+                                         {font: '30px Courier',
+                                          fill: '#ffffff'})
+        }
+        else {
+            highscoreLbl = this.add.text(300, 50, 'New High Score!',
+                                         {font: '30px Courier',
+                                          fill: '#ffffff'})
+            highscore = score
+        }
+
+        // wKey = game.input.keyboard.addKey(Phaser.Keyboard.W)
+        // wKey.onDown.addOnce(this.restart, this)
+        this.input.keyboard.on('keydown_W', this.restart, this)
+    }
+
+    /**
+     * Go back to title screen.
+     */
+    restart() {
+        'use strict'
+        game.scene.start('title')
     }
 }
 
@@ -523,8 +621,8 @@ const gameConfig = {
         LoadScene,
         TitleScene,
         PlayScene,
-        // levelScene,
-        // endScene
+        LevelScene,
+        EndScene
     ],
 }
 
