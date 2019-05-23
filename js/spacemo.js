@@ -124,8 +124,7 @@ class TitleScene extends Phaser.Scene {
             gun: 1      // which gun is currently active
         }
 
-        game.scene.start('play')
-        game.scene.remove('title')
+        game.scene.switch('title', 'play')
     }
 }
 
@@ -170,29 +169,17 @@ class PlayScene extends Phaser.Scene {
         this.grabPowerup = this.sound.add('grabpowerup')
         this.powerupSpeed = 100
 
-        // this.speedPowerups = game.add.group()
         this.speedPowerups = this.physics.add.group()
         this.speedPowerups.enableBody = true
-        // this.speedPowerups.physicsBodyType = Phaser.Physics.ARCADE
         this.speedPowerups.createMultiple(5, 'pup-speed')
-        // this.speedPowerups.setAll('outOfBoundsKill', true)
-        // this.speedPowerups.setAll('checkWorldBounds', true)
 
-        // this.bulletPowerups = game.add.group()
         this.bulletPowerups = this.physics.add.group()
         this.bulletPowerups.enableBody = true
-        // this.bulletPowerups.physicsBodyType = Phaser.Physics.ARCADE
         this.bulletPowerups.createMultiple(5, 'pup-bullet')
-        // this.bulletPowerups.setAll('outOfBoundsKill', true)
-        // this.bulletPowerups.setAll('checkWorldBounds', true)
 
-        // this.weaponPowerups = game.add.group()
         this.weaponPowerups = this.physics.add.group()
         this.weaponPowerups.enableBody = true
-        // this.weaponPowerups.physicsBodyType = Phaser.Physics.ARCADE
         this.weaponPowerups.createMultiple(5, 'pup-weapon')
-        // this.weaponPowerups.setAll('outOfBoundsKill', true)
-        // this.weaponPowerups.setAll('checkWorldBounds', true)
 
         // Bullets
         this.bullets = this.physics.add.group({
@@ -272,7 +259,6 @@ class PlayScene extends Phaser.Scene {
         }
 
         this.background.tilePositionY -= this.backgroundSpeed
-        // this.background.y += this.backgroundSpeed
 
         this.scoreText.text = 'Score: ' + score
     }
@@ -342,7 +328,7 @@ class PlayScene extends Phaser.Scene {
                 Phaser.Math.Between(0,8)*200
             tween = this.tweens.add({
                 targets: enemy,
-                x: xPos + 50,              // '+=100'
+                x: xPos + 50,            // '+=100'
                 ease: 'Linear',          // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 1000,
                 repeat: -1,              // -1: infinity
@@ -376,26 +362,20 @@ class PlayScene extends Phaser.Scene {
         score += 10
         this.enemiesKilled++
 
-        console.log('bullets active: ' + this.bullets.countActive())
-        console.log('  ' + this.enemiesKilled)
+        // console.log('bullets active: ' + this.bullets.countActive())
+        // console.log('  ' + this.enemiesKilled)
 
         if (this.enemiesKilled === 5) {
-            // game.scene.start('level')
-
-        this.registry.destroy()
-        this.events.off()
-        game.scene.switch('play', 'level')
-        this.cursors.right.isDown = false
-        this.cursors.left.isDown = false
-        // this.cursors.up.isDown = false
-        // this.cursors.down.isDown = false
-        console.log('[PLAY] CURSORS OFF')
-        this.scene.stop()
-
-
+            this.registry.destroy()
+            this.events.off()
+            game.scene.switch('play', 'level')
+            this.cursors.right.isDown = false
+            this.cursors.left.isDown = false
+            console.log('[PLAY] CURSORS OFF')
+            this.scene.stop()
         }
 
-        if (Phaser.Math.Between(1,10) === 10) {
+        if (Phaser.Math.Between(1,3) === 3) {
             this.createPowerup(xPos, yPos)
         }
     }
@@ -436,6 +416,8 @@ class PlayScene extends Phaser.Scene {
         'use strict'
         let powerup, rng
 
+        console.log('POWERUP')
+
         rng = Phaser.Math.Between(1,7)
         if (rng <= 3) {
             powerup = this.speedPowerups.getFirstDead(false)
@@ -460,8 +442,8 @@ class PlayScene extends Phaser.Scene {
      */
     addSpeed(player, powerup) {
         'use strict'
+
         powerup.kill()
-        // this.grabPowerup.play()
         this.sound.play('grabPowerup')
         score += 15
         playerState.speed += 20
@@ -474,8 +456,8 @@ class PlayScene extends Phaser.Scene {
      */
     addBullet(player, powerup) {
         'use strict'
+
         powerup.kill()
-        // this.grabPowerup.play()
         this.sound.play('grabPowerup')
         score += 15
         if (playerState.bulletTimeOffset > 100) {
@@ -490,8 +472,8 @@ class PlayScene extends Phaser.Scene {
      */
     addWeapon(player, powerup) {
         'use strict'
+
         powerup.kill()
-        // this.grabPowerup.play()
         this.sound.play('grabPowerup')
         score += 15
         if (playerState.gun === 1) {
@@ -505,18 +487,15 @@ class PlayScene extends Phaser.Scene {
      */
     end() {
         'use strict'
-        // this.explosion.play()
-        this.sound.play('explosion')
-        // game.scene.start('end')
-
         console.log('[PLAY] end')
+
+        this.sound.play('explosion')
         this.registry.destroy()
         this.events.off()
         game.scene.switch('play', 'end')
         this.cursors.right.isDown = false
         this.cursors.left.isDown = false
-        // this.cursors.up.isDown = false
-        // this.cursors.down.isDown = false
+
         console.log('[PLAY] CURSORS OFF')
         this.scene.stop()
     }
@@ -545,7 +524,6 @@ class LevelScene extends Phaser.Scene {
         this.input.keyboard.on('keydown_W', this.start, this)
 
         this.events.on('wake', function() {
-            // console.log('[LEVEL] wake')
             that.nameLbl.text = 'LEVEL ' + level + ' COMPLETE'
         })
     }
@@ -565,6 +543,8 @@ class EndScene extends Phaser.Scene {
     create() {
         'use strict'
         let scoreLbl, nameLbl, startLbl, highscoreLbl, wKey
+
+        console.log('[END] create')
 
         scoreLbl = this.add.text(600, 10, 'Score: ' + score,
                                  {font: '30px Courier',
@@ -588,8 +568,6 @@ class EndScene extends Phaser.Scene {
             highscore = score
         }
 
-        // wKey = game.input.keyboard.addKey(Phaser.Keyboard.W)
-        // wKey.onDown.addOnce(this.restart, this)
         this.input.keyboard.on('keydown_W', this.restart, this)
     }
 
@@ -598,7 +576,9 @@ class EndScene extends Phaser.Scene {
      */
     restart() {
         'use strict'
-        game.scene.start('title')
+
+        console.log('[END] restart')
+        game.scene.switch('end', 'title')
     }
 }
 
