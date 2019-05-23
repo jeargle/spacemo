@@ -9,23 +9,11 @@ class BootScene extends Phaser.Scene {
         super('boot')
     }
 
-    init(config) {
-        console.log('[BOOT] init', config)
-    }
-
-    preload() {
-        console.log('[BOOT] preload')
-    }
-
     create() {
         console.log('[BOOT] create')
 
         game.scene.start('load')
         game.scene.remove('boot')
-    }
-
-    update() {
-        console.log('[BOOT] update')
     }
 }
 
@@ -34,14 +22,11 @@ class LoadScene extends Phaser.Scene {
         super('load')
     }
 
-    init(config) {
-        console.log('[LOAD] init', config)
-    }
-
     preload() {
         'use strict'
-        console.log('[LOAD] preload')
         let loadLbl
+
+        console.log('[LOAD] preload')
 
         loadLbl = this.add.text(80, 160, 'loading...',
                                 {font: '30px Courier',
@@ -71,27 +56,11 @@ class LoadScene extends Phaser.Scene {
         game.scene.start('title')
         game.scene.remove('load')
     }
-
-    update() {
-        console.log('[LOAD] update')
-    }
 }
 
 class TitleScene extends Phaser.Scene {
     constructor() {
         super('title')
-    }
-
-    init(config) {
-        console.log('[TITLE] init', config)
-    }
-
-    preload() {
-        console.log('[TITLE] preload')
-    }
-
-    update() {
-        console.log('[TITLE] update')
     }
 
     create() {
@@ -153,9 +122,8 @@ class PlayScene extends Phaser.Scene {
             repeat: 30,
             setXY: { x: 0, y: -100 },
         })
-        let enemies = this.enemies
-        enemies.children.iterate(function(enemy) {
-            enemies.killAndHide(enemy)
+        this.enemies.children.iterate(function(enemy) {
+            that.enemies.killAndHide(enemy)
             enemy.body.onWorldBounds = true
         })
 
@@ -169,17 +137,38 @@ class PlayScene extends Phaser.Scene {
         this.grabPowerup = this.sound.add('grabpowerup')
         this.powerupSpeed = 100
 
-        this.speedPowerups = this.physics.add.group()
-        this.speedPowerups.enableBody = true
-        this.speedPowerups.createMultiple(5, 'pup-speed')
+        this.speedPowerups = this.physics.add.group({
+            key: 'pup-speed',
+            active: false,
+            repeat: 5,
+            setXY: { x: 0, y: -300},
+        })
+        this.speedPowerups.children.iterate(function(sp) {
+            that.speedPowerups.killAndHide(sp)
+            // sp.body.onWorldBounds = true
+        })
 
-        this.bulletPowerups = this.physics.add.group()
-        this.bulletPowerups.enableBody = true
-        this.bulletPowerups.createMultiple(5, 'pup-bullet')
+        this.bulletPowerups = this.physics.add.group({
+            key: 'pup-bullet',
+            active: false,
+            repeat: 5,
+            setXY: { x: 50, y: -300},
+        })
+        this.bulletPowerups.children.iterate(function(bp) {
+            that.bulletPowerups.killAndHide(bp)
+            // bp.body.onWorldBounds = true
+        })
 
-        this.weaponPowerups = this.physics.add.group()
-        this.weaponPowerups.enableBody = true
-        this.weaponPowerups.createMultiple(5, 'pup-weapon')
+        this.weaponPowerups = this.physics.add.group({
+            key: 'pup-weapon',
+            active: false,
+            repeat: 5,
+            setXY: { x: 50, y: -300},
+        })
+        this.weaponPowerups.children.iterate(function(wp) {
+            that.weaponPowerups.killAndHide(wp)
+            // wp.body.onWorldBounds = true
+        })
 
         // Bullets
         this.bullets = this.physics.add.group({
@@ -188,9 +177,8 @@ class PlayScene extends Phaser.Scene {
             repeat: 30,
             setXY: { x: 0, y: -200},
         })
-        let bullets = this.bullets
-        bullets.children.iterate(function(bullet) {
-            bullets.killAndHide(bullet)
+        this.bullets.children.iterate(function(bullet) {
+            that.bullets.killAndHide(bullet)
             bullet.body.onWorldBounds = true
         })
 
@@ -407,6 +395,15 @@ class PlayScene extends Phaser.Scene {
         bullet.setPosition(0, -200)
     }
 
+    removePowerup(powerup) {
+        'use strict'
+
+        // bullet.body.collideWorldBounds = false
+        powerup.setActive(false)
+        powerup.setVisible(false)
+        powerup.setPosition(0, -300)
+    }
+
     /**
      * Make a new powerup at the given position.
      * @param xPos - x position
@@ -419,17 +416,23 @@ class PlayScene extends Phaser.Scene {
         console.log('POWERUP')
 
         rng = Phaser.Math.Between(1,7)
+        console.log(rng)
         if (rng <= 3) {
+            console.log('SPEED')
             powerup = this.speedPowerups.getFirstDead(false)
         }
         else if (rng >= 5) {
+            console.log('BULLET')
             powerup = this.bulletPowerups.getFirstDead(false)
         }
         else {
+            console.log('WEAPON')
             powerup = this.weaponPowerups.getFirstDead(false)
         }
 
         if (powerup) {
+            powerup.active = true
+            powerup.visible = true
             powerup.setPosition(xPos, yPos)
             powerup.body.velocity.y = this.powerupSpeed
         }
@@ -443,8 +446,8 @@ class PlayScene extends Phaser.Scene {
     addSpeed(player, powerup) {
         'use strict'
 
-        powerup.kill()
-        this.sound.play('grabPowerup')
+        this.removePowerup(powerup)
+        this.sound.play('grabpowerup')
         score += 15
         playerState.speed += 20
     }
@@ -457,8 +460,8 @@ class PlayScene extends Phaser.Scene {
     addBullet(player, powerup) {
         'use strict'
 
-        powerup.kill()
-        this.sound.play('grabPowerup')
+        this.removePowerup(powerup)
+        this.sound.play('grabpowerup')
         score += 15
         if (playerState.bulletTimeOffset > 100) {
             playerState.bulletTimeOffset -= 20
@@ -473,8 +476,8 @@ class PlayScene extends Phaser.Scene {
     addWeapon(player, powerup) {
         'use strict'
 
-        powerup.kill()
-        this.sound.play('grabPowerup')
+        this.removePowerup(powerup)
+        this.sound.play('grabpowerup')
         score += 15
         if (playerState.gun === 1) {
             playerState.gun++
