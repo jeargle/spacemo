@@ -131,11 +131,11 @@ class PlayScene extends Phaser.Scene {
         this.enemyTime = 0
         this.enemyTimeOffset = 900 - (level*100)
         this.enemySpeed = 90 + (level*10)
-        this.explosion = this.sound.add('explosion')
+        this.sound.add('explosion')
 
         // Powerups
-        this.grabPowerup = this.sound.add('grabpowerup')
         this.powerupSpeed = 100
+        this.sound.add('grabpowerup')
 
         this.speedPowerups = this.physics.add.group({
             key: 'pup-speed',
@@ -184,6 +184,8 @@ class PlayScene extends Phaser.Scene {
 
         this.bulletTime = 0
         this.bulletSpeed = 500
+        this.sound.add('fire1')
+        this.sound.add('fire2')
 
         // Score
         this.scoreText = this.add.text(600, 10, 'Score: ' + score,
@@ -196,9 +198,6 @@ class PlayScene extends Phaser.Scene {
             'right': Phaser.Input.Keyboard.KeyCodes.D,
             'fire': Phaser.Input.Keyboard.KeyCodes.SPACE,
         })
-
-        this.fire1 = this.sound.add('fire1')
-        this.fire2 = this.sound.add('fire2')
 
         this.physics.add.overlap(this.player, this.enemies,
                                  this.end, null, this)
@@ -269,14 +268,14 @@ class PlayScene extends Phaser.Scene {
                 bullet1.body.collideWorldBounds = true
 
                 if (bullet1) {
-                    this.fire1.play()
+                    this.sound.play('fire1')
                     bullet1.setPosition(this.player.x, this.player.y - 14)
                     bullet1.body.velocity.y = -this.bulletSpeed
                 }
             }
             else {
                 this.bulletTime = this.time.now + playerState.bulletTimeOffset
-                this.fire2.play()
+                this.sound.play('fire2')
 
                 bullet1 = this.bullets.getFirstDead(false)
                 bullet1.active = true
