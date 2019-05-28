@@ -17,6 +17,7 @@ class BootScene extends Phaser.Scene {
     }
 }
 
+
 class LoadScene extends Phaser.Scene {
     constructor() {
         super('load')
@@ -58,6 +59,7 @@ class LoadScene extends Phaser.Scene {
     }
 }
 
+
 class TitleScene extends Phaser.Scene {
     constructor() {
         super('title')
@@ -96,6 +98,7 @@ class TitleScene extends Phaser.Scene {
         game.scene.switch('title', 'play')
     }
 }
+
 
 class PlayScene extends Phaser.Scene {
     constructor() {
@@ -536,6 +539,7 @@ class LevelScene extends Phaser.Scene {
         game.scene.switch('level', 'play')
     }
 }
+
 
 class EndScene extends Phaser.Scene {
     constructor() {
