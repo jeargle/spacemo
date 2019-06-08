@@ -24,7 +24,6 @@ class LoadScene extends Phaser.Scene {
     }
 
     preload() {
-        'use strict'
         let loadLbl
 
         console.log('[LOAD] preload')
@@ -50,8 +49,6 @@ class LoadScene extends Phaser.Scene {
     }
 
     create() {
-        'use strict'
-
         console.log('[LOAD] create')
 
         game.scene.start('title')
@@ -66,7 +63,6 @@ class TitleScene extends Phaser.Scene {
     }
 
     create() {
-        'use strict'
         let nameLbl, startLbl, wKey
 
         console.log('[TITLE] create')
@@ -82,8 +78,6 @@ class TitleScene extends Phaser.Scene {
     }
 
     start() {
-        'use strict'
-
         console.log('start')
 
         // Reset game state
@@ -106,8 +100,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     create() {
-        'use strict'
-
         let that = this
 
         // Background
@@ -226,8 +218,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     update() {
-        'use strict'
-
         // console.log('[PLAY] update')
 
         if (this.cursors.right.isDown) {
@@ -257,7 +247,6 @@ class PlayScene extends Phaser.Scene {
      * Fire player's weapon.
      */
     fire() {
-        'use strict'
         let bullet1, bullet2
 
         // console.log('FIRE')
@@ -301,7 +290,6 @@ class PlayScene extends Phaser.Scene {
      * Add a new enemy to the screen.
      */
     dispatchEnemy() {
-        'use strict'
         let enemy, tween, xPos
 
         enemy = this.enemies.getFirstDead(false)
@@ -333,7 +321,6 @@ class PlayScene extends Phaser.Scene {
      * @param enemy
      */
     killEnemy(bullet, enemy) {
-        'use strict'
         let xPos, yPos
 
         console.log('KILL')
@@ -371,8 +358,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     removeEnemy(enemy) {
-        'use strict'
-
         enemy.body.collideWorldBounds = false
         enemy.setActive(false)
         enemy.setVisible(false)
@@ -381,8 +366,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     removeBullet(bullet) {
-        'use strict'
-
         // bullet.active = false
         // bullet.visible = false
         // enemy.active = false
@@ -398,8 +381,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     removePowerup(powerup) {
-        'use strict'
-
         // bullet.body.collideWorldBounds = false
         powerup.setActive(false)
         powerup.setVisible(false)
@@ -412,7 +393,6 @@ class PlayScene extends Phaser.Scene {
      * @param yPos - y position
      */
     createPowerup(xPos, yPos) {
-        'use strict'
         let powerup, rng
 
         console.log('POWERUP')
@@ -446,8 +426,6 @@ class PlayScene extends Phaser.Scene {
      * @param powerup
      */
     addSpeed(player, powerup) {
-        'use strict'
-
         this.removePowerup(powerup)
         this.sound.play('grabpowerup')
         score += 15
@@ -460,8 +438,6 @@ class PlayScene extends Phaser.Scene {
      * @param powerup
      */
     addBullet(player, powerup) {
-        'use strict'
-
         this.removePowerup(powerup)
         this.sound.play('grabpowerup')
         score += 15
@@ -476,8 +452,6 @@ class PlayScene extends Phaser.Scene {
      * @param powerup
      */
     addWeapon(player, powerup) {
-        'use strict'
-
         this.removePowerup(powerup)
         this.sound.play('grabpowerup')
         score += 15
@@ -491,7 +465,6 @@ class PlayScene extends Phaser.Scene {
      * Exit to game over screen.
      */
     end() {
-        'use strict'
         console.log('[PLAY] end')
 
         this.sound.play('explosion')
@@ -513,7 +486,6 @@ class LevelScene extends Phaser.Scene {
     }
 
     create() {
-        'use strict'
         let that, startLbl
 
         console.log('[LEVEL] create')
@@ -534,7 +506,6 @@ class LevelScene extends Phaser.Scene {
     }
 
     start() {
-        'use strict'
         level += 1
         game.scene.switch('level', 'play')
     }
@@ -547,7 +518,6 @@ class EndScene extends Phaser.Scene {
     }
 
     create() {
-        'use strict'
         let scoreLbl, nameLbl, startLbl, highscoreLbl, wKey
 
         console.log('[END] create')
@@ -581,8 +551,6 @@ class EndScene extends Phaser.Scene {
      * Go back to title screen.
      */
     restart() {
-        'use strict'
-
         console.log('[END] restart')
         game.scene.switch('end', 'title')
     }
