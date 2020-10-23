@@ -129,7 +129,6 @@ class PlayScene extends Phaser.Scene {
         this.sound.add('explosion')
 
         // Powerups
-        this.powerupSpeed = 100
         this.sound.add('grabpowerup')
 
         this.speedPowerups = this.physics.add.group({
@@ -416,7 +415,7 @@ class PlayScene extends Phaser.Scene {
             powerup.active = true
             powerup.visible = true
             powerup.setPosition(xPos, yPos)
-            powerup.body.velocity.y = this.powerupSpeed
+            powerup.body.velocity.y = this.enemySpeed
         }
     }
 
