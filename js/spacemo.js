@@ -296,7 +296,7 @@ class PlayScene extends Phaser.Scene {
         enemy.visible = true
 
         if (enemy) {
-            xPos = Phaser.Math.Between(1,6)*100
+            xPos = Phaser.Math.Between(1,5)*100
             enemy.setPosition(xPos, -30)
             enemy.body.velocity.x = 0
             enemy.body.velocity.y = this.enemySpeed
@@ -559,13 +559,13 @@ class EndScene extends Phaser.Scene {
 const gameConfig = {
     type: Phaser.CANVAS,
     parent: 'game-div',
-    width: 800,
+    width: 600,
     height: 600,
     physics: {
         default: 'arcade',
         arcade: {
             debug: true,
-            width: 800,
+            width: 600,
             height: 600,
         }
     },
