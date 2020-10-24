@@ -28,7 +28,7 @@ class LoadScene extends Phaser.Scene {
 
         console.log('[LOAD] preload')
 
-        loadLbl = this.add.text(80, 160, 'loading...',
+        loadLbl = this.add.text(40, 160, 'loading...',
                                 {font: '30px Courier',
                                  fill: '#ffffff'})
 
@@ -67,10 +67,10 @@ class TitleScene extends Phaser.Scene {
 
         console.log('[TITLE] create')
 
-        nameLbl = this.add.text(80, 160, 'SPACEMO',
+        nameLbl = this.add.text(40, 160, 'SPACEMO',
                                 {font: '50px Courier',
                                  fill: '#ffffff'})
-        startLbl = this.add.text(80, 240, 'press "W" to start',
+        startLbl = this.add.text(40, 240, 'press "W" to start',
                                  {font: '30px Courier',
                                   fill: '#ffffff'})
 
@@ -182,7 +182,7 @@ class PlayScene extends Phaser.Scene {
         this.sound.add('fire2')
 
         // Score
-        this.scoreText = this.add.text(600, 10, 'Score: ' + score,
+        this.scoreText = this.add.text(400, 10, 'Score: ' + score,
                                        {font: '30px Courier',
                                         fill: '#ffffff'})
 
@@ -296,13 +296,13 @@ class PlayScene extends Phaser.Scene {
         enemy.visible = true
 
         if (enemy) {
-            xPos = Phaser.Math.Between(1,5)*100
+            xPos = Phaser.Math.Between(0, 5)*100 + 25
             enemy.setPosition(xPos, -30)
             enemy.body.velocity.x = 0
             enemy.body.velocity.y = this.enemySpeed
             this.enemyTime = this.time.now +
                 this.enemyTimeOffset +
-                Phaser.Math.Between(0,8)*200
+                Phaser.Math.Between(0, 8)*200
             tween = this.tweens.add({
                 targets: enemy,
                 x: xPos + 50,            // '+=100'
@@ -490,10 +490,10 @@ class LevelScene extends Phaser.Scene {
         console.log('[LEVEL] create')
 
         that = this
-        this.nameLbl = this.add.text(80, 160, 'LEVEL ' + level + ' COMPLETE',
+        this.nameLbl = this.add.text(40, 160, 'LEVEL ' + level + ' COMPLETE',
                                      {font: '50px Courier',
                                       fill: '#ffffff'})
-        startLbl = this.add.text(80, 240, 'press "W" to start next level',
+        startLbl = this.add.text(40, 240, 'press "W" to start next level',
                                  {font: '30px Courier',
                                   fill: '#ffffff'})
 
@@ -521,18 +521,18 @@ class EndScene extends Phaser.Scene {
 
         console.log('[END] create')
 
-        scoreLbl = this.add.text(600, 10, 'Score: ' + score,
+        scoreLbl = this.add.text(400, 10, 'Score: ' + score,
                                  {font: '30px Courier',
                                   fill: '#ffffff'})
-        nameLbl = this.add.text(80, 160, 'YOU DIED',
+        nameLbl = this.add.text(40, 160, 'YOU DIED',
                                 {font: '50px Courier',
                                  fill: '#ffffff'})
-        startLbl = this.add.text(80, 240, 'press "W" to restart',
+        startLbl = this.add.text(40, 240, 'press "W" to restart',
                                  {font: '30px Courier',
                                   fill: '#ffffff'})
 
         if (score <= highscore) {
-            highscoreLbl = this.add.text(510, 50, 'High Score: ' + highscore,
+            highscoreLbl = this.add.text(310, 50, 'High Score: ' + highscore,
                                          {font: '30px Courier',
                                           fill: '#ffffff'})
         }
