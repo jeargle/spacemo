@@ -35,11 +35,25 @@ class LoadScene extends Phaser.Scene {
         // Load images
         this.load.image('player', 'assets/ship-red.png')
         this.load.image('enemy', 'assets/ray-blue.png')
-        this.load.image('pup-speed', 'assets/pup-green.png')
-        this.load.image('pup-bullet', 'assets/pup-red.png')
-        this.load.image('pup-weapon', 'assets/pup-blue.png')
         this.load.image('bullet', 'assets/bullet.png')
         this.load.image('background', 'assets/space-background.png')
+
+        // Load animations
+        this.load.spritesheet(
+            'pup-speed',
+            'assets/pup-green-ani.png',
+            { frameWidth: 16, frameHeight: 16 }
+        )
+        this.load.spritesheet(
+            'pup-bullet',
+            'assets/pup-red-ani.png',
+            { frameWidth: 16, frameHeight: 16 }
+        )
+        this.load.spritesheet(
+            'pup-weapon',
+            'assets/pup-blue-ani.png',
+            { frameWidth: 16, frameHeight: 16 }
+        )
 
         // Load sound effects
         this.load.audio('explosion', 'assets/explosion.wav')
@@ -78,7 +92,7 @@ class TitleScene extends Phaser.Scene {
     }
 
     start() {
-        console.log('start')
+        console.log('[TITLE] start')
 
         // Reset game state
         score = 0
@@ -141,6 +155,12 @@ class PlayScene extends Phaser.Scene {
             that.speedPowerups.killAndHide(sp)
             // sp.body.onWorldBounds = true
         })
+        this.anims.create({
+            key: 'pup-speed-ani',
+            frames: this.anims.generateFrameNumbers('pup-speed', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        })
 
         this.bulletPowerups = this.physics.add.group({
             key: 'pup-bullet',
@@ -152,6 +172,12 @@ class PlayScene extends Phaser.Scene {
             that.bulletPowerups.killAndHide(bp)
             // bp.body.onWorldBounds = true
         })
+        this.anims.create({
+            key: 'pup-bullet-ani',
+            frames: this.anims.generateFrameNumbers('pup-bullet', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        })
 
         this.weaponPowerups = this.physics.add.group({
             key: 'pup-weapon',
@@ -162,6 +188,12 @@ class PlayScene extends Phaser.Scene {
         this.weaponPowerups.children.iterate(function(wp) {
             that.weaponPowerups.killAndHide(wp)
             // wp.body.onWorldBounds = true
+        })
+        this.anims.create({
+            key: 'pup-weapon-ani',
+            frames: this.anims.generateFrameNumbers('pup-weapon', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
         })
 
         // Bullets
@@ -401,14 +433,17 @@ class PlayScene extends Phaser.Scene {
         if (rng <= 3) {
             console.log('SPEED')
             powerup = this.speedPowerups.getFirstDead(false)
+            powerup.play('pup-speed-ani')
         }
         else if (rng >= 5) {
             console.log('BULLET')
             powerup = this.bulletPowerups.getFirstDead(false)
+            powerup.play('pup-bullet-ani')
         }
         else {
             console.log('WEAPON')
             powerup = this.weaponPowerups.getFirstDead(false)
+            powerup.play('pup-weapon-ani')
         }
 
         if (powerup) {
