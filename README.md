@@ -4,6 +4,14 @@ spacemo
 Kill the space monsters before they kill you!
 
 
+Controls
+--------
+
+* A - move ship left
+* D - move ship right
+* SPACE - fire
+
+
 How to Run
 ----------
 
