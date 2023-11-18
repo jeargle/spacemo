@@ -29,4 +29,4 @@ Dependencies
 
 Dependencies are included.
 
-1. phaser
+* phaser
