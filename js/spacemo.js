@@ -324,10 +324,10 @@ class PlayScene extends Phaser.Scene {
         let enemy, tween, xPos
 
         enemy = this.enemies.getFirstDead(false)
-        enemy.active = true
-        enemy.visible = true
 
         if (enemy) {
+            enemy.active = true
+            enemy.visible = true
             xPos = Phaser.Math.Between(0, 5)*100 + 25
             enemy.setPosition(xPos, -30)
             enemy.body.velocity.x = 0
@@ -343,6 +343,8 @@ class PlayScene extends Phaser.Scene {
                 repeat: -1,              // -1: infinity
                 yoyo: true
             })
+        } else {
+            console.log('No enemy found!!!')
         }
     }
 
@@ -371,7 +373,7 @@ class PlayScene extends Phaser.Scene {
         this.enemiesKilled++
 
         // console.log('bullets active: ' + this.bullets.countActive())
-        // console.log('  ' + this.enemiesKilled)
+        console.log('  ' + this.enemiesKilled)
 
         if (this.enemiesKilled === 5) {
             this.registry.destroy()
