@@ -153,7 +153,6 @@ class PlayScene extends Phaser.Scene {
         })
         this.speedPowerups.children.iterate(function(sp) {
             that.speedPowerups.killAndHide(sp)
-            // sp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-speed-ani',
@@ -170,7 +169,6 @@ class PlayScene extends Phaser.Scene {
         })
         this.bulletPowerups.children.iterate(function(bp) {
             that.bulletPowerups.killAndHide(bp)
-            // bp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-bullet-ani',
@@ -187,7 +185,6 @@ class PlayScene extends Phaser.Scene {
         })
         this.weaponPowerups.children.iterate(function(wp) {
             that.weaponPowerups.killAndHide(wp)
-            // wp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-weapon-ani',
@@ -227,8 +224,6 @@ class PlayScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.enemies,
                                  this.end, null, this)
-        // this.physics.add.overlap(this.bullets, this.enemies,
-        //                          this.killEnemy, null, this)
         this.physics.add.collider(this.bullets, this.enemies,
                                  this.killEnemy, null, this)
         this.physics.add.overlap(this.player, this.speedPowerups,
@@ -241,10 +236,6 @@ class PlayScene extends Phaser.Scene {
             console.log('WORLD BOUNDS')
             // console.log(body)
             that.removeBullet(body.gameObject)
-            // body.collideWorldBounds = false
-            // gameObject.setActive(false)
-            // gameObject.setVisible(false)
-            // gameObject.setPosition(0, -200)
         })
     }
 
@@ -337,10 +328,10 @@ class PlayScene extends Phaser.Scene {
                 Phaser.Math.Between(0, 8)*200
             tween = this.tweens.add({
                 targets: enemy,
-                x: xPos + 50,            // '+=100'
-                ease: 'Linear',          // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                x: xPos + 50,         // '+=100'
+                ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
                 duration: 1000,
-                repeat: -1,              // -1: infinity
+                repeat: -1,           // -1: infinity
                 yoyo: true
             })
         } else {
@@ -399,14 +390,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     removeBullet(bullet) {
-        // bullet.active = false
-        // bullet.visible = false
-        // enemy.active = false
-        // enemy.visible = false
-        // bullet.setActive(false)
-        // bullet.setVisible(false)
-        // bullet.setActive(false)
-        // bullet.setVisible(false)
         bullet.body.collideWorldBounds = false
         bullet.setActive(false)
         bullet.setVisible(false)
@@ -414,7 +397,6 @@ class PlayScene extends Phaser.Scene {
     }
 
     removePowerup(powerup) {
-        // bullet.body.collideWorldBounds = false
         powerup.setActive(false)
         powerup.setVisible(false)
         powerup.setPosition(0, -300)
