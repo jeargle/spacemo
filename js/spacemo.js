@@ -244,11 +244,9 @@ class PlayScene extends Phaser.Scene {
 
         if (this.cursors.right.isDown) {
             this.player.body.setVelocityX(playerState.speed)
-        }
-        else if (this.cursors.left.isDown) {
+        } else if (this.cursors.left.isDown) {
             this.player.body.setVelocityX(-playerState.speed)
-        }
-        else {
+        } else {
             this.player.body.setVelocityX(0)
         }
 
@@ -286,8 +284,7 @@ class PlayScene extends Phaser.Scene {
                     bullet1.setPosition(this.player.x, this.player.y - 14)
                     bullet1.body.velocity.y = -this.bulletSpeed
                 }
-            }
-            else {
+            } else if (playerState.gun === 2) {
                 this.bulletTime = this.time.now + playerState.bulletTimeOffset
                 this.sound.play('fire2')
 
@@ -366,6 +363,7 @@ class PlayScene extends Phaser.Scene {
         // console.log('bullets active: ' + this.bullets.countActive())
         console.log('  ' + this.enemiesKilled)
 
+        // Advance to next level.
         if (this.enemiesKilled === 5) {
             this.registry.destroy()
             this.events.off()
@@ -376,11 +374,16 @@ class PlayScene extends Phaser.Scene {
             this.scene.stop()
         }
 
+        // Create new powerup.
         if (Phaser.Math.Between(1,3) === 3) {
             this.createPowerup(xPos, yPos)
         }
     }
 
+    /**
+     * Remove an enemy from the view.
+     * @param enemy
+     */
     removeEnemy(enemy) {
         enemy.body.collideWorldBounds = false
         enemy.setActive(false)
@@ -389,6 +392,10 @@ class PlayScene extends Phaser.Scene {
         enemy.setPosition(0, -100)
     }
 
+    /**
+     * Remove a bullet from the view.
+     * @param bullet
+     */
     removeBullet(bullet) {
         bullet.body.collideWorldBounds = false
         bullet.setActive(false)
@@ -396,6 +403,10 @@ class PlayScene extends Phaser.Scene {
         bullet.setPosition(0, -200)
     }
 
+    /**
+     * Remove a powerup from the view.
+     * @param powerup
+     */
     removePowerup(powerup) {
         powerup.setActive(false)
         powerup.setVisible(false)
@@ -418,13 +429,11 @@ class PlayScene extends Phaser.Scene {
             console.log('SPEED')
             powerup = this.speedPowerups.getFirstDead(false)
             powerup.play('pup-speed-ani')
-        }
-        else if (rng >= 5) {
+        } else if (rng >= 5) {
             console.log('BULLET')
             powerup = this.bulletPowerups.getFirstDead(false)
             powerup.play('pup-bullet-ani')
-        }
-        else {
+        } else {
             console.log('WEAPON')
             powerup = this.weaponPowerups.getFirstDead(false)
             powerup.play('pup-weapon-ani')
@@ -554,8 +563,7 @@ class EndScene extends Phaser.Scene {
             highscoreLbl = this.add.text(310, 50, 'High Score: ' + highscore,
                                          {font: '30px Courier',
                                           fill: '#ffffff'})
-        }
-        else {
+        } else {
             highscoreLbl = this.add.text(300, 50, 'New High Score!',
                                          {font: '30px Courier',
                                           fill: '#ffffff'})
