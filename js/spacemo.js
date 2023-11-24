@@ -419,27 +419,34 @@ class PlayScene extends Phaser.Scene {
      * @param yPos - y position
      */
     createPowerup(xPos, yPos) {
-        let powerup, rng
+        let powerup, rng, rngMax, animation
 
         console.log('POWERUP')
 
-        rng = Phaser.Math.Between(1,7)
-        console.log(rng)
-        if (rng <= 3) {
-            console.log('SPEED')
-            powerup = this.speedPowerups.getFirstDead(false)
-            powerup.play('pup-speed-ani')
-        } else if (rng >= 5) {
-            console.log('BULLET')
-            powerup = this.bulletPowerups.getFirstDead(false)
-            powerup.play('pup-bullet-ani')
+        if (playerState.gun === 1) {
+            rngMax = 7
         } else {
-            console.log('WEAPON')
+            rngMax = 6
+        }
+        rng = Phaser.Math.Between(1, rngMax)
+        console.log(`  rng: ${rng}`)
+
+        if (rng <= 3) {
+            console.log('  SPEED')
+            powerup = this.speedPowerups.getFirstDead(false)
+            animation = 'pup-speed-ani'
+        } else if (rng > 3 && rng <= 6) {
+            console.log('  BULLET')
+            powerup = this.bulletPowerups.getFirstDead(false)
+            animation = 'pup-bullet-ani'
+        } else {
+            console.log('  WEAPON')
             powerup = this.weaponPowerups.getFirstDead(false)
-            powerup.play('pup-weapon-ani')
+            animation = 'pup-weapon-ani'
         }
 
         if (powerup) {
+            powerup.play(animation)
             powerup.active = true
             powerup.visible = true
             powerup.setPosition(xPos, yPos)
