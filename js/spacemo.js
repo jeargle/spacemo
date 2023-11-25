@@ -153,6 +153,7 @@ class PlayScene extends Phaser.Scene {
         })
         this.speedPowerups.children.iterate(function(sp) {
             that.speedPowerups.killAndHide(sp)
+            sp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-speed-ani',
@@ -169,6 +170,7 @@ class PlayScene extends Phaser.Scene {
         })
         this.bulletPowerups.children.iterate(function(bp) {
             that.bulletPowerups.killAndHide(bp)
+            bp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-bullet-ani',
@@ -185,6 +187,7 @@ class PlayScene extends Phaser.Scene {
         })
         this.weaponPowerups.children.iterate(function(wp) {
             that.weaponPowerups.killAndHide(wp)
+            wp.body.onWorldBounds = true
         })
         this.anims.create({
             key: 'pup-weapon-ani',
@@ -232,10 +235,27 @@ class PlayScene extends Phaser.Scene {
                                  this.addBullet, null, this)
         this.physics.add.overlap(this.player, this.weaponPowerups,
                                  this.addWeapon, null, this)
-        this.physics.world.on('worldbounds', function(body) {
+        this.physics.world.on('worldbounds', function(body, up, down, left, right) {
             console.log('WORLD BOUNDS')
             // console.log(body)
-            that.removeBullet(body.gameObject)
+            // console.log(up)
+            // console.log(down)
+            // console.log(left)
+            // console.log(right)
+            if (that.bullets.contains(body.gameObject)) {
+                console.log('  BULLET')
+                that.removeBullet(body.gameObject)
+            } else if (that.enemies.contains(body.gameObject)) {
+                console.log('  ENEMY')
+                console.log(`  ${up} ${down} ${left} ${right}`)
+                that.removeEnemy(body.gameObject)
+            } else if (that.speedPowerups.contains(body.gameObject) ||
+                       that.bulletPowerups.contains(body.gameObject) ||
+                       that.weaponPowerups.contains(body.gameObject)) {
+                console.log('  POWERUP')
+                console.log(`  ${up} ${down} ${left} ${right}`)
+                that.removePowerup(body.gameObject)
+            }
         })
     }
 
@@ -317,9 +337,11 @@ class PlayScene extends Phaser.Scene {
             enemy.active = true
             enemy.visible = true
             xPos = Phaser.Math.Between(0, 5)*100 + 25
-            enemy.setPosition(xPos, -30)
+            // enemy.setPosition(xPos, -30)
+            enemy.setPosition(xPos, 16)
             enemy.body.velocity.x = 0
             enemy.body.velocity.y = this.enemySpeed
+            enemy.setCollideWorldBounds(true)
             this.enemyTime = this.time.now +
                 this.enemyTimeOffset +
                 Phaser.Math.Between(0, 8)*200
@@ -389,6 +411,7 @@ class PlayScene extends Phaser.Scene {
         enemy.setActive(false)
         enemy.setVisible(false)
         this.tweens.killTweensOf(enemy)
+        enemy.setVelocity(0, 0)
         enemy.setPosition(0, -100)
     }
 
@@ -400,6 +423,7 @@ class PlayScene extends Phaser.Scene {
         bullet.body.collideWorldBounds = false
         bullet.setActive(false)
         bullet.setVisible(false)
+        bullet.setVelocity(0, 0)
         bullet.setPosition(0, -200)
     }
 
@@ -408,8 +432,10 @@ class PlayScene extends Phaser.Scene {
      * @param powerup
      */
     removePowerup(powerup) {
+        powerup.body.collideWorldBounds = false
         powerup.setActive(false)
         powerup.setVisible(false)
+        powerup.setVelocity(0, 0)
         powerup.setPosition(0, -300)
     }
 
@@ -451,6 +477,7 @@ class PlayScene extends Phaser.Scene {
             powerup.visible = true
             powerup.setPosition(xPos, yPos)
             powerup.body.velocity.y = this.enemySpeed
+            powerup.setCollideWorldBounds(true)
         }
     }
 
