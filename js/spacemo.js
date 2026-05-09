@@ -131,7 +131,7 @@ class PlayScene extends Phaser.Scene {
             repeat: 30,
             setXY: { x: 0, y: -100 },
         })
-        this.enemies.children.iterate(function(enemy) {
+        this.enemies.children.forEach(function(enemy) {
             that.enemies.killAndHide(enemy)
             enemy.body.onWorldBounds = true
         })
@@ -151,7 +151,7 @@ class PlayScene extends Phaser.Scene {
             repeat: 5,
             setXY: { x: 0, y: -300},
         })
-        this.speedPowerups.children.iterate(function(sp) {
+        this.speedPowerups.children.forEach(function(sp) {
             that.speedPowerups.killAndHide(sp)
             sp.body.onWorldBounds = true
         })
@@ -168,7 +168,7 @@ class PlayScene extends Phaser.Scene {
             repeat: 5,
             setXY: { x: 50, y: -300},
         })
-        this.bulletPowerups.children.iterate(function(bp) {
+        this.bulletPowerups.children.forEach(function(bp) {
             that.bulletPowerups.killAndHide(bp)
             bp.body.onWorldBounds = true
         })
@@ -185,7 +185,7 @@ class PlayScene extends Phaser.Scene {
             repeat: 5,
             setXY: { x: 50, y: -300},
         })
-        this.weaponPowerups.children.iterate(function(wp) {
+        this.weaponPowerups.children.forEach(function(wp) {
             that.weaponPowerups.killAndHide(wp)
             wp.body.onWorldBounds = true
         })
@@ -203,7 +203,7 @@ class PlayScene extends Phaser.Scene {
             repeat: 30,
             setXY: { x: 0, y: -200},
         })
-        this.bullets.children.iterate(function(bullet) {
+        this.bullets.children.forEach(function(bullet) {
             that.bullets.killAndHide(bullet)
             bullet.body.onWorldBounds = true
         })
